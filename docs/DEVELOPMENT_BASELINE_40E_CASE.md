@@ -24,17 +24,21 @@ The recorded `7345.4399993` seconds is only the independent PowerShell recovery-
 
 ## Aggregate results
 
-![Horizontal comparison of final, EMA-selected, and analytic empty-prediction control on non-empty-reference Dice (n=3) and mean absolute volume error (n=5, mL). The analytic control is not model inference; aggregates cannot independently reproduce protected per-case metrics.](figures/development_metric_tradeoff.svg)
+![Two-panel horizontal bar chart comparing Final, EMA-selected checkpoint, and Empty-mask control (analytic): Mean Dice for non-empty references (n=3) and Volume MAE in mL for all cases (n=5).](figures/development_metric_tradeoff.svg)
 
-*Figure. Checkpoint ranking depends on the evaluation endpoint. Development-exposed, single seed/fold; lower net-volume error alone does not establish usable foreground segmentation. [PNG preview](figures/development_metric_tradeoff.png).*
+*Figure. Mean Dice uses the three non-empty references; Volume MAE uses all
+five cases. The Empty-mask control is analytic, not model inference. Its lower
+net volume error does not establish effective foreground segmentation. This is
+a post-hoc, single-seed/fold development analysis, not an independent test.
+[PNG preview](figures/development_metric_tradeoff.png).*
 
 All volume quantities are unweighted means in mL. `n` is the number of applicable cases out of five.
 
-| Source | Strict Dice | FPV | FNV | Absolute volume error | Precision | Recall |
+| Source | Mean Dice, non-empty references | FPV | FNV | Volume MAE (mL) | Precision | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Final (`current_epoch=40`) | 0.09907 (n=3) | 48.07 mL (n=5) | 29.95 mL (n=5) | 59.43 mL (n=5) | 0.1036 (n=5) | 0.3256 (n=3) |
-| EMA-selected (`current_epoch=36`) | 0.2187 (n=3) | 65.64 mL (n=5) | 23.88 mL (n=5) | 63.21 mL (n=5) | 0.1537 (n=5) | 0.4568 (n=3) |
-| `ANALYTIC_EMPTY_PREDICTION_CONTROL` | 0.000 (n=3) | 0.000 mL (n=5) | 33.30 mL (n=5) | 33.30 mL (n=5) | undefined (n=0) | 0.000 (n=3) |
+| EMA-selected checkpoint (`current_epoch=36`) | 0.2187 (n=3) | 65.64 mL (n=5) | 23.88 mL (n=5) | 63.21 mL (n=5) | 0.1537 (n=5) | 0.4568 (n=3) |
+| Empty-mask control (analytic; `ANALYTIC_EMPTY_PREDICTION_CONTROL`) | 0.000 (n=3) | 0.000 mL (n=5) | 33.30 mL (n=5) | 33.30 mL (n=5) | undefined (n=0) | 0.000 (n=3) |
 
 The standard Dice formula is 0 for empty reference/non-empty prediction and is
 0/0 only when both masks are empty. The project's strict policy nevertheless

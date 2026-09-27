@@ -15,11 +15,13 @@ when the predicted foreground is poorly located. The repository therefore
 treats metric choice, applicability counts, physical units, and empty-reference
 behavior as part of the engineering contract rather than presentation details.
 
-![Evidence overview showing separate synthetic PyTorch, nnU-Net development-case, and synthetic reliability tracks. Independent testing, external validation, and a real-patient reliability study remain incomplete.](docs/figures/evidence_overview.svg)
+![Three separate tracks: a synthetic PyTorch training demonstration, a five-case single-seed/fold nnU-Net development analysis, and risk-coverage utilities tested with synthetic inputs.](docs/figures/evidence_overview.svg)
 
-*Three separate evidence tracks, not one completed patient-level pipeline. The
-native PyTorch and reliability tracks use synthetic inputs; the nnU-Net track is
-a five-case, development-exposed case study. [PNG preview](docs/figures/evidence_overview.png).*
+*Figure 1. Inputs, computation, and outputs for three separate tracks. The
+PyTorch training demonstration and risk–coverage utilities use synthetic tests;
+the nnU-Net analysis uses five development-validation cases from one seed and
+fold. These tracks are not a completed patient-level pipeline. [PNG
+preview](docs/figures/evidence_overview.png).*
 
 The tracks serve different purposes: the PyTorch path makes the mechanics of a
 training update inspectable, the development case preserves a bounded real-run
@@ -31,7 +33,7 @@ levels or convert synthetic checks into patient evidence.
 
 | Capability | Implementation | Behavioral check | Evidence scope |
 | --- | --- | --- | --- |
-| Native PyTorch forward, BCE/soft-Dice loss, backward gradients, and optimizer update | [`unet3d.py`](src/pet_ai/models/unet3d.py), [`segmentation.py`](src/pet_ai/losses/segmentation.py), [`engine.py`](src/pet_ai/training/engine.py) | [`test_unet3d.py`](tests/test_unet3d.py), [`test_pytorch_loss.py`](tests/test_pytorch_loss.py), [`test_pytorch_training.py`](tests/test_pytorch_training.py) | Synthetic engineering demonstration; the compact U-Net pattern and PyTorch are not claimed as original research. |
+| PyTorch training demonstration: forward, BCE/soft-Dice loss, backward gradients, and optimizer update | [`unet3d.py`](src/pet_ai/models/unet3d.py), [`segmentation.py`](src/pet_ai/losses/segmentation.py), [`engine.py`](src/pet_ai/training/engine.py) | [`test_unet3d.py`](tests/test_unet3d.py), [`test_pytorch_loss.py`](tests/test_pytorch_loss.py), [`test_pytorch_training.py`](tests/test_pytorch_training.py) | Synthetic tests; the compact U-Net pattern and PyTorch are not claimed as original research. |
 | PET/CT geometry QC and affine-determinant mask volume | [`geometry.py`](src/pet_ai/qc/geometry.py), [`volume.py`](src/pet_ai/quantification/volume.py) | [`test_geometry.py`](tests/test_geometry.py), [`test_quantification.py`](tests/test_quantification.py) | Synthetic NIfTI and NumPy checks; same-grid status does not prove anatomical registration. |
 | Binary segmentation and physical error quantities | [`segmentation.py`](src/pet_ai/evaluation/segmentation.py), [`volume.py`](src/pet_ai/quantification/volume.py) | [`test_segmentation_metrics.py`](tests/test_segmentation_metrics.py), [`test_quantification.py`](tests/test_quantification.py) | TP/FP/FN, Dice, FPV/FNV and generic mask volume under explicit empty-reference and unit policies. |
 | Risk–coverage curves, AURC, and order-invariant expected handling of score ties | [`risk_coverage.py`](src/pet_ai/reliability/risk_coverage.py) | [`test_risk_coverage.py`](tests/test_risk_coverage.py) | Synthetic arrays only; no completed patient-level reliability study. |
@@ -40,15 +42,15 @@ levels or convert synthetic checks into patient evidence.
 
 The traceable case is a post-hoc, development-exposed comparison from one
 40-epoch run: seed `20260924`, fold `0`, and five development-validation cases.
-The checkpoint chosen by upstream online EMA pseudo Dice had higher strict Dice
-than the final checkpoint (`0.2187` versus `0.0991`, each over `n=3` non-empty
-references), while the final checkpoint had lower mean absolute volume error
+The EMA-selected checkpoint, chosen by upstream online EMA pseudo Dice, had
+higher Mean Dice, non-empty references, than the final checkpoint (`0.2187`
+versus `0.0991`, each over `n=3`), while the final checkpoint had lower Volume MAE
 (`59.43 mL` versus `63.21 mL`, each over `n=5`). Thus overlap and net-volume
-endpoints ranked the checkpoints differently. An analytic all-empty prediction
-control had `33.30 mL` mean absolute volume error (`n=5`) but Dice `0.0000`
-(`n=3`); it is a calculation, not model inference, and its lower error does not
-indicate usable foreground segmentation. These observations do not isolate a
-causal effect of training duration.
+endpoints ranked the checkpoints differently. The Empty-mask control (analytic)
+had Volume MAE `33.30 mL` (`n=5`) but Mean Dice `0.0000` (`n=3`); it is not model
+inference, and its lower error does not indicate usable foreground
+segmentation. These observations do not isolate a causal effect of training
+duration.
 
 Only public-safe aggregates and applicability counts are available here. The
 protected predictions and per-case values needed to recompute those aggregates
@@ -74,7 +76,7 @@ The demo creates temporary synthetic PET, CT, reference-mask, prediction-mask,
 and manifest files; exercises manifest and split validation, geometry and label
 QC, voxel and lesion metrics, and provenance; then removes the temporary image
 files. Its output is engineering status for synthetic fixtures, not patient
-performance. The optional [native PyTorch CPU demo](scripts/demo_pytorch_train.py)
+performance. The optional [PyTorch training demonstration](scripts/demo_pytorch_train.py)
 requires the separately declared `pytorch` extra. The nnU-Net development
 method is a [`PARTIAL_RECIPE`](configs/development_baseline_40e/README.md), not
 an independent one-command reproduction of the historical run.
@@ -98,3 +100,5 @@ Further reading: [architecture](docs/ARCHITECTURE.md),
 [partial recipe](configs/development_baseline_40e/README.md),
 [data provenance](docs/DATA_PROVENANCE.md), and
 [third-party attribution](THIRD_PARTY.md).
+
+Candidate future study design: [PROPOSED / NOT RUN](docs/RESEARCH_DESIGN_CANDIDATE.md).

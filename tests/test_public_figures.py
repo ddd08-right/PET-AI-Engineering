@@ -19,17 +19,34 @@ def test_metric_figure_uses_frozen_values_counts_and_semantic_order() -> None:
     svg = render_public_figures.metric_svg(data)
     labels = (
         "Final",
-        "EMA-selected",
-        "Analytic empty control",
+        "EMA-selected checkpoint",
+        "Empty-mask control",
     )
     positions = [svg.index(f">{label}</text>") for label in labels]
     assert positions == sorted(positions)
     assert "0.0991" in svg and "0.2187" in svg and "0.0000" in svg
     assert "59.43 mL" in svg and "63.21 mL" in svg and "33.30 mL" in svg
-    assert svg.count("n=3 of 5") == 3
-    assert svg.count("n=5 of 5") == 3
+    assert "Mean Dice, non-empty references" in svg and "n=3" in svg
+    assert "Volume MAE (mL)" in svg and "all cases, n=5" in svg
     assert "not model inference" in svg
-    assert "0.0" in svg and "1.0" in svg and "70" in svg
+    assert "0.0" in svg and "1.0" in svg and ">80</text>" in svg
+    assert 'width="0.0" height="34"' in svg
+
+
+def test_overview_and_sampler_use_concise_presentation_contracts() -> None:
+    data, method, _ = render_public_figures.load_and_validate_inputs()
+
+    overview = render_public_figures.overview_svg()
+    sampler = render_public_figures.sampler_svg(method)
+
+    assert data["scope"]["development_validation_cases"] == 5
+    assert "PyTorch training demonstration" in overview
+    assert "nnU-Net development analysis" in overview
+    assert "Risk–coverage utilities" in overview
+    assert "Public sampler adaptation; PARTIAL_RECIPE" in overview
+    assert "u ~ Uniform(0,1); force_fg = (u &lt; 0.82)" in sampler
+    assert "Upstream nnU-Net" in sampler and "get_bbox" in sampler
+    assert "does not mean clinical absence" in sampler
 
 
 @pytest.mark.parametrize("failure", ("missing", "nonfinite"))

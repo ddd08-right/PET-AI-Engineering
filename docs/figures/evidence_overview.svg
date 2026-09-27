@@ -1,92 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="940" viewBox="0 0 1600 940" role="img" aria-labelledby="title desc">
-<title id="title">What this repository implements and evaluates</title>
-<desc id="desc">Three parallel evidence tracks: a synthetic native PyTorch demo, a five-case single-seed fold-zero nnU-Net development case, and synthetic reliability validation. Independent testing, external validation, and a real reliability study remain incomplete.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="600" viewBox="0 0 1400 600" role="img" aria-labelledby="title desc">
+<title id="title">Three evidence tracks</title>
+<desc id="desc">Separate PyTorch training demonstration, nnU-Net development analysis, and risk-coverage utility tracks; not a completed patient-level pipeline.</desc>
 <defs>
-<pattern id="control-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-<rect width="9" height="9" fill="#f0f1f2"/>
-<line x1="0" y1="0" x2="0" y2="9" stroke="#929aa2" stroke-width="3"/>
+<pattern id="control-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+<rect width="8" height="8" fill="#f4f4f4"/>
+<line x1="0" y1="0" x2="0" y2="8" stroke="#69727a" stroke-width="2"/>
 </pattern>
-<marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-<path d="M0,0 L10,5 L0,10 z" fill="#718096"/>
+<marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+<path d="M0,0 L8,4 L0,8 z" fill="#67717b"/>
 </marker>
 </defs>
-<rect x="0" y="0" width="1600" height="940" fill="#ffffff"/>
-<style>text{font-family:sans-serif;fill:#263545} .title{font-size:34px;font-weight:700} .subtitle{font-size:18px;fill:#586879} .section{font-size:23px;font-weight:700} .body{font-size:18px} .small{font-size:15px;fill:#586879} .label{font-size:16px;font-weight:700} .metric{font-size:16px;font-variant-numeric:tabular-nums}</style>
-<text x="64.0" y="72.0" class="title" text-anchor="start">What this repository implements and evaluates</text>
-<text x="64.0" y="106.0" class="subtitle" text-anchor="start">Three parallel evidence tracks; arrows show only the computation within each track.</text>
-<rect x="64.0" y="144.0" width="440.0" height="568.0" rx="18" fill="#edf3f8" stroke="#527da5" stroke-width="2"/>
-<rect x="548.0" y="144.0" width="440.0" height="568.0" rx="18" fill="#fbf1e9" stroke="#d18852" stroke-width="2"/>
-<rect x="1032.0" y="144.0" width="440.0" height="568.0" rx="18" fill="#edf5f3" stroke="#5b8e88" stroke-width="2"/>
-<text x="92.0" y="190.0" class="section" text-anchor="start">A  Native PyTorch baseline</text>
-<rect x="92.0" y="210.0" width="178.0" height="34" rx="17" fill="#dce8f2"/>
-<text x="181.0" y="233.0" class="label" text-anchor="middle" fill="#23364d">SYNTHETIC DEMO</text>
-<rect x="92.0" y="292.0" width="120.0" height="90.0" rx="14" fill="#ffffff" stroke="#b7c9d8" stroke-width="2"/>
-<text x="152.0" y="332.0" class="label" text-anchor="middle">Synthetic</text>
-<text x="152.0" y="358.0" class="small" text-anchor="middle">PET/CT tensors</text>
-<line x1="215.0" y1="337.0" x2="225.0" y2="337.0" stroke="#527da5" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="228.0" y="292.0" width="120.0" height="90.0" rx="14" fill="#ffffff" stroke="#b7c9d8" stroke-width="2"/>
-<text x="288.0" y="332.0" class="label" text-anchor="middle">3D U-Net</text>
-<text x="288.0" y="358.0" class="small" text-anchor="middle">native PyTorch</text>
-<line x1="351.0" y1="337.0" x2="361.0" y2="337.0" stroke="#527da5" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="364.0" y="292.0" width="124.0" height="90.0" rx="14" fill="#ffffff" stroke="#b7c9d8" stroke-width="2"/>
-<text x="426.0" y="327.0" class="small" text-anchor="middle">Loss</text>
-<text x="426.0" y="350.0" class="small" text-anchor="middle">backward</text>
-<text x="426.0" y="373.0" class="small" text-anchor="middle">update</text>
-<text x="92.0" y="445.0" class="label" text-anchor="start">Demonstrates</text>
-<text x="92.0" y="476.0" class="body" text-anchor="start">forward pass → loss → gradient →</text>
-<text x="92.0" y="504.0" class="body" text-anchor="start">optimizer update on synthetic tensors.</text>
-<text x="92.0" y="574.0" class="small" text-anchor="start">No patient images or clinical</text>
-<text x="92.0" y="598.0" class="small" text-anchor="start">performance result in this track.</text>
-<text x="576.0" y="190.0" class="section" text-anchor="start">B  nnU-Net development case</text>
-<rect x="576.0" y="210.0" width="230.0" height="34" rx="17" fill="#f5e1d2"/>
-<text x="691.0" y="233.0" class="label" text-anchor="middle" fill="#23364d">DEVELOPMENT_EXPOSED</text>
-<rect x="576.0" y="266.0" width="230.0" height="34" rx="17" fill="#ffffff"/>
-<text x="691.0" y="289.0" class="label" text-anchor="middle" fill="#23364d">5 DEVELOPMENT CASES</text>
-<rect x="820.0" y="266.0" width="194.0" height="34" rx="17" fill="#ffffff"/>
-<text x="917.0" y="289.0" class="label" text-anchor="middle" fill="#23364d">SINGLE SEED / FOLD 0</text>
-<rect x="576.0" y="342.0" width="126.0" height="90.0" rx="14" fill="#ffffff" stroke="#d8b89f" stroke-width="2"/>
-<text x="639.0" y="378.0" class="label" text-anchor="middle">PET + CT</text>
-<text x="639.0" y="405.0" class="small" text-anchor="middle">inputs</text>
-<line x1="707.0" y1="387.0" x2="735.0" y2="387.0" stroke="#d18852" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="741.0" y="342.0" width="142.0" height="90.0" rx="14" fill="#ffffff" stroke="#d8b89f" stroke-width="2"/>
-<text x="812.0" y="378.0" class="label" text-anchor="middle">Upstream</text>
-<text x="812.0" y="405.0" class="small" text-anchor="middle">nnU-Net + sampler</text>
-<line x1="888.0" y1="387.0" x2="914.0" y2="387.0" stroke="#d18852" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="920.0" y="342.0" width="92.0" height="90.0" rx="14" fill="#ffffff" stroke="#d8b89f" stroke-width="2"/>
-<text x="966.0" y="378.0" class="label" text-anchor="middle">Mask</text>
-<text x="966.0" y="405.0" class="small" text-anchor="middle">metrics</text>
-<rect x="576.0" y="466.0" width="182.0" height="34" rx="17" fill="#f6e8dd"/>
-<text x="667.0" y="489.0" class="label" text-anchor="middle" fill="#23364d">PARTIAL_RECIPE</text>
-<text x="576.0" y="554.0" class="body" text-anchor="start">Final and EMA-selected predictions were</text>
-<text x="576.0" y="582.0" class="body" text-anchor="start">evaluated on five development cases.</text>
-<text x="576.0" y="637.0" class="small" text-anchor="start">Not an independent test or external</text>
-<text x="576.0" y="661.0" class="small" text-anchor="start">validation; public aggregates lack per-case</text>
-<text x="576.0" y="685.0" class="small" text-anchor="start">inputs for independent recomputation.</text>
-<text x="1060.0" y="190.0" class="section" text-anchor="start">C  Reliability toolkit</text>
-<rect x="1060.0" y="210.0" width="220.0" height="34" rx="17" fill="#dcebe7"/>
-<text x="1170.0" y="233.0" class="label" text-anchor="middle" fill="#23364d">SYNTHETIC VALIDATION</text>
-<rect x="1060.0" y="318.0" width="112.0" height="90.0" rx="14" fill="#ffffff" stroke="#b7cec9" stroke-width="2"/>
-<text x="1116.0" y="354.0" class="label" text-anchor="middle">Synthetic</text>
-<text x="1116.0" y="381.0" class="small" text-anchor="middle">errors + scores</text>
-<line x1="1177.0" y1="363.0" x2="1201.0" y2="363.0" stroke="#5b8e88" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="1208.0" y="318.0" width="96.0" height="90.0" rx="14" fill="#ffffff" stroke="#b7cec9" stroke-width="2"/>
-<text x="1256.0" y="369.0" class="label" text-anchor="middle">Ranking</text>
-<line x1="1309.0" y1="363.0" x2="1331.0" y2="363.0" stroke="#5b8e88" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="1338.0" y="318.0" width="158.0" height="90.0" rx="14" fill="#ffffff" stroke="#b7cec9" stroke-width="2"/>
-<text x="1417.0" y="354.0" class="label" text-anchor="middle">Risk–coverage</text>
-<text x="1417.0" y="381.0" class="small" text-anchor="middle">/ AURC</text>
-<text x="1060.0" y="475.0" class="body" text-anchor="start">Exercises ranking and selective-review</text>
-<text x="1060.0" y="503.0" class="body" text-anchor="start">calculations on synthetic arrays.</text>
-<text x="1060.0" y="574.0" class="small" text-anchor="start">A real-patient reliability study and</text>
-<text x="1060.0" y="598.0" class="small" text-anchor="start">clinical utility evaluation are not complete.</text>
-<rect x="64.0" y="746.0" width="1408.0" height="146.0" rx="16" fill="#f7f8fa" stroke="#d9e0e7" stroke-width="2"/>
-<text x="92.0" y="786.0" class="label" text-anchor="start">Not completed</text>
-<text x="92.0" y="816.0" class="body" text-anchor="start">Independent test  •  External validation  •  Real-patient reliability study</text>
-<text x="92.0" y="859.0" class="small" text-anchor="start">Evidence labels describe engineering/run status; ENGINEERING_SMOKE or PASS does not establish clinical validity.</text>
-<rect x="1100.0" y="770.0" width="128.0" height="34" rx="17" fill="#e5edf4"/>
-<text x="1164.0" y="793.0" class="label" text-anchor="middle" fill="#23364d">SYNTHETIC</text>
-<rect x="1244.0" y="770.0" width="150.0" height="34" rx="17" fill="#f5e5d9"/>
-<text x="1319.0" y="793.0" class="label" text-anchor="middle" fill="#23364d">DEVELOPMENT</text>
-<rect x="1410.0" y="770.0" width="110.0" height="34" rx="17" fill="#e8ebef"/>
-<text x="1465.0" y="793.0" class="label" text-anchor="middle" fill="#23364d">PLANNED</text>
+<rect x="0" y="0" width="1400" height="600" fill="#ffffff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#20252b} .title{font-size:26px;font-weight:700} .subtitle{font-size:18px;fill:#4f5963} .section{font-size:22px;font-weight:700} .body{font-size:19px} .small{font-size:17px;fill:#4f5963} .label{font-size:18px;font-weight:700} .metric{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}</style>
+<text x="50.0" y="46.0" class="title" text-anchor="start">Three evidence tracks</text>
+<text x="50.0" y="76.0" class="subtitle" text-anchor="start">Inputs → computation → outputs; tracks are evaluated separately.</text>
+<rect x="50.0" y="110.0" width="390.0" height="400.0" fill="#ffffff" stroke="#aeb7c0" stroke-width="1"/>
+<text x="72.0" y="148.0" class="section" text-anchor="start" fill="#3b6f9c">A</text>
+<text x="108.0" y="148.0" class="label" text-anchor="start">PyTorch training demonstration</text>
+<rect x="485.0" y="110.0" width="390.0" height="400.0" fill="#ffffff" stroke="#aeb7c0" stroke-width="1"/>
+<text x="507.0" y="148.0" class="section" text-anchor="start" fill="#c86f32">B</text>
+<text x="543.0" y="148.0" class="label" text-anchor="start">nnU-Net development analysis</text>
+<rect x="920.0" y="110.0" width="390.0" height="400.0" fill="#ffffff" stroke="#aeb7c0" stroke-width="1"/>
+<text x="942.0" y="148.0" class="section" text-anchor="start" fill="#377f78">C</text>
+<text x="978.0" y="148.0" class="label" text-anchor="start">Risk–coverage utilities</text>
+<rect x="68.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#3b6f9c" stroke-width="1"/>
+<text x="120.0" y="259.0" class="label" text-anchor="middle">Synthetic</text>
+<text x="120.0" y="285.0" class="small" text-anchor="middle">PET/CT input</text>
+<line x1="176.0" y1="266.0" x2="187.0" y2="266.0" stroke="#3b6f9c" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="193.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#3b6f9c" stroke-width="1"/>
+<text x="245.0" y="259.0" class="label" text-anchor="middle">Forward</text>
+<text x="245.0" y="285.0" class="small" text-anchor="middle">loss</text>
+<line x1="301.0" y1="266.0" x2="312.0" y2="266.0" stroke="#3b6f9c" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="318.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#3b6f9c" stroke-width="1"/>
+<text x="370.0" y="259.0" class="label" text-anchor="middle">Backward</text>
+<text x="370.0" y="285.0" class="small" text-anchor="middle">update</text>
+<text x="70.0" y="355.0" class="label" text-anchor="start">Synthetic tests</text>
+<text x="70.0" y="385.0" class="small" text-anchor="start">Output: logits, loss, gradients, update</text>
+<rect x="503.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#c86f32" stroke-width="1"/>
+<text x="555.0" y="259.0" class="label" text-anchor="middle">PET + CT</text>
+<text x="555.0" y="285.0" class="small" text-anchor="middle">5 cases</text>
+<line x1="611.0" y1="266.0" x2="622.0" y2="266.0" stroke="#c86f32" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="628.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#c86f32" stroke-width="1"/>
+<text x="680.0" y="259.0" class="label" text-anchor="middle">Upstream</text>
+<text x="680.0" y="285.0" class="small" text-anchor="middle">nnU-Net</text>
+<line x1="736.0" y1="266.0" x2="747.0" y2="266.0" stroke="#c86f32" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="753.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#c86f32" stroke-width="1"/>
+<text x="805.0" y="259.0" class="label" text-anchor="middle">Metrics</text>
+<text x="805.0" y="285.0" class="small" text-anchor="middle">Final / EMA</text>
+<text x="505.0" y="355.0" class="label" text-anchor="start">Single seed / fold 0</text>
+<text x="505.0" y="385.0" class="small" text-anchor="start">Public sampler adaptation; PARTIAL_RECIPE</text>
+<text x="505.0" y="414.0" class="small" text-anchor="start">Development analysis; not an independent test</text>
+<rect x="938.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#377f78" stroke-width="1"/>
+<text x="990.0" y="259.0" class="label" text-anchor="middle">Synthetic</text>
+<text x="990.0" y="285.0" class="small" text-anchor="middle">errors, scores</text>
+<line x1="1046.0" y1="266.0" x2="1057.0" y2="266.0" stroke="#377f78" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1063.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#377f78" stroke-width="1"/>
+<text x="1115.0" y="259.0" class="label" text-anchor="middle">Risk rank</text>
+<text x="1115.0" y="285.0" class="small" text-anchor="middle">expected ties</text>
+<line x1="1171.0" y1="266.0" x2="1182.0" y2="266.0" stroke="#377f78" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1188.0" y="220.0" width="104.0" height="92.0" fill="#ffffff" stroke="#377f78" stroke-width="1"/>
+<text x="1240.0" y="259.0" class="label" text-anchor="middle">Output</text>
+<text x="1240.0" y="285.0" class="small" text-anchor="middle">risk–coverage</text>
+<text x="940.0" y="355.0" class="label" text-anchor="start">Synthetic tests</text>
+<text x="940.0" y="385.0" class="small" text-anchor="start">Real-patient reliability study incomplete</text>
+<line x1="50.0" y1="550.0" x2="1350.0" y2="550.0" stroke="#d6dbe0" stroke-width="1"/>
+<text x="50.0" y="580.0" class="small" text-anchor="start">Shared QC and provenance do not make these tracks one end-to-end patient study.</text>
 </svg>

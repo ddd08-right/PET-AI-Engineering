@@ -6,9 +6,14 @@ not a runnable reproduction of the five-case result from this public repository.
 
 ## Inputs and contract
 
-![Sampler flow showing annotation-coordinate strata assigned to slot 0 or slot 1, the slot-1 0.82 foreground-forcing branch, and downstream patch selection delegated to upstream nnU-Net get_bbox. No-class-1-coordinate cases are not asserted to be clinically negative.](../../docs/figures/midpoint_sampling.svg)
+![Two annotation-coordinate case pools are sampled uniformly into fixed slots: slot 0 uses force foreground false; slot 1 draws u uniformly from zero to one and forces foreground when u is below 0.82. Both delegate patch selection to upstream nnU-Net get_bbox.](../../docs/figures/midpoint_sampling.svg)
 
-*Figure. Case selection is separate from spatial patch selection. Ignore-label mode can alter the non-forced random-box branch. [PNG preview](../../docs/figures/midpoint_sampling.png).*
+*Figure. Pool membership is defined by class-1 annotation coordinates; no
+coordinates does not mean clinical absence. `0.82` is the slot-1
+foreground-force probability, not the positive-case sampling proportion. Both
+slots delegate patch selection to upstream nnU-Net `get_bbox`, whose behavior
+can depend on ignore-label settings. [PNG
+preview](../../docs/figures/midpoint_sampling.png).*
 
 - Install the historical nnU-Net/PyTorch environment separately. These are not
   core package dependencies.
