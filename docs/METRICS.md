@@ -12,7 +12,13 @@
 - FPV_mL: false-positive voxels multiplied by voxel volume.
 - FNV_mL: false-negative voxels multiplied by voxel volume.
 
-For empty ground truth, Dice is undefined and represented internally as `NaN`; JSON-style output converts it to `null` with status `UNDEFINED_EMPTY_GT`. Dice is not forced to 1 for negative cases because a negative case with false-positive uptake should not look perfect. Use FPV_mL to evaluate negative cases.
+The standard formula gives Dice 0 when the reference is empty and prediction is
+non-empty; only the both-empty case has a 0/0 denominator. For compatibility,
+this project excludes every empty-reference case from its strict Dice aggregate
+and represents it internally as `NaN`; JSON-style output converts that to
+`null` with the historical status `UNDEFINED_EMPTY_GT`. Read this as
+“not applicable under the project aggregation policy,” not a universal claim
+of mathematical undefinedness. Use FPV_mL to evaluate negative cases.
 
 Array entry points require same-shaped, finite, strictly binary 3D arrays; they
 cannot establish physical alignment. NIfTI evaluation additionally requires a

@@ -79,6 +79,11 @@ def _validated_spatial_geometry(image: nib.spatialimages.SpatialImage) -> tuple[
         if abs(float(np.linalg.det(form_mm[:3, :3]))) <= np.finfo(float).eps:
             raise ValueError(f"coded {name} is degenerate")
         coded_affines.append((name, form_mm))
+    if not coded_affines:
+        raise ValueError(
+            "NIfTI requires at least one coded qform or sform for verified physical geometry; "
+            "fallback affine is not an accepted spatial source"
+        )
     if len(coded_affines) == 2 and not np.allclose(
         coded_affines[0][1], coded_affines[1][1], atol=1e-5, rtol=0
     ):
@@ -95,7 +100,7 @@ def load_nifti_geometry(path: Path) -> ImageGeometry:
         spacing=spacing_mm,
         spatial_unit=spatial_unit,
         orientation=orientation,
-        affine=affine_mm.round(8).tolist(),
+        affine=affine_mm.tolist(),
     )
 
 

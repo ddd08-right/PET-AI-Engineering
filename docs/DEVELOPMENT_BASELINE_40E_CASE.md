@@ -4,7 +4,13 @@
 
 ## Research question
 
-Can checkpoint ranking differ when the evaluation emphasizes segmentation overlap versus net volume error? We compare the final checkpoint with the checkpoint selected during training by the upstream nnU-Net online validation exponential-moving-average (EMA) pseudo Dice rule. Here, “best” means best by that one online rule; it does not mean best for every reported endpoint.
+This question was formulated for the post-hoc case analysis; it was not a
+preregistered hypothesis: can checkpoint ranking differ when evaluation
+emphasizes segmentation overlap versus net volume error? We compare the final
+checkpoint with the checkpoint selected during training by the upstream nnU-Net
+online validation exponential-moving-average (EMA) pseudo Dice rule. Here,
+“best” means best by that one online rule; it does not mean best for every
+reported endpoint.
 
 ## Scope and method
 
@@ -18,15 +24,27 @@ The recorded `7345.4399993` seconds is only the independent PowerShell recovery-
 
 ## Aggregate results
 
+![Horizontal comparison of final, EMA-selected, and analytic empty-prediction control on non-empty-reference Dice (n=3) and mean absolute volume error (n=5, mL). The analytic control is not model inference; aggregates cannot independently reproduce protected per-case metrics.](figures/development_metric_tradeoff.svg)
+
+*Figure. Checkpoint ranking depends on the evaluation endpoint. Development-exposed, single seed/fold; lower net-volume error alone does not establish usable foreground segmentation. [PNG preview](figures/development_metric_tradeoff.png).*
+
 All volume quantities are unweighted means in mL. `n` is the number of applicable cases out of five.
 
 | Source | Strict Dice | FPV | FNV | Absolute volume error | Precision | Recall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Final (`current_epoch=40`) | 0.0990737955022662 (n=3) | 48.0671270171131 (n=5) | 29.953001088725934 (n=5) | 59.43324339635385 (n=5) | 0.1036035798027041 (n=5) | 0.32563257155088693 (n=3) |
-| EMA-selected (`current_epoch=36`) | 0.21873356253933532 (n=3) | 65.64380085751517 (n=5) | 23.876806649560894 (n=5) | 63.21033723691589 (n=5) | 0.15370141560633158 (n=5) | 0.45684196803589244 (n=3) |
-| `ANALYTIC_EMPTY_PREDICTION_CONTROL` | 0.0 (n=3) | 0.0 (n=5) | 33.304612026299765 (n=5) | 33.304612026299765 (n=5) | undefined (n=0) | 0.0 (n=3) |
+| Final (`current_epoch=40`) | 0.09907 (n=3) | 48.07 mL (n=5) | 29.95 mL (n=5) | 59.43 mL (n=5) | 0.1036 (n=5) | 0.3256 (n=3) |
+| EMA-selected (`current_epoch=36`) | 0.2187 (n=3) | 65.64 mL (n=5) | 23.88 mL (n=5) | 63.21 mL (n=5) | 0.1537 (n=5) | 0.4568 (n=3) |
+| `ANALYTIC_EMPTY_PREDICTION_CONTROL` | 0.000 (n=3) | 0.000 mL (n=5) | 33.30 mL (n=5) | 33.30 mL (n=5) | undefined (n=0) | 0.000 (n=3) |
 
-The strict policy treats Dice, recall, and relative volume error as undefined when the reference is empty. Dice and recall therefore average the three non-empty-reference cases. FPV, FNV, prediction/reference volume, and absolute volume error retain all five cases. Precision is defined for all five real-model predictions because every prediction was non-empty; it is undefined for the analytic all-empty control.
+The standard Dice formula is 0 for empty reference/non-empty prediction and is
+0/0 only when both masks are empty. The project's strict policy nevertheless
+excludes every empty-reference case from Dice, recall, and relative-volume-error
+aggregation. Dice and recall therefore average the three non-empty-reference
+cases. The frozen `NaN`/`null` values and `UNDEFINED_EMPTY_GT` status are retained
+as a historical project-policy API label, not a universal mathematical claim.
+FPV, FNV, prediction/reference volume, and absolute volume error retain all five
+cases. Precision is defined for all five real-model predictions because every
+prediction was non-empty; it is undefined for the analytic all-empty control.
 
 The automatic nnU-Net final-validation Dice was `0.05944427730135972`. It averages all five cases for foreground class 1: an empty-reference case with a non-empty prediction contributes Dice `0`, while only a both-empty pair becomes `NaN` and is omitted by `nanmean`. This five-case value is shown separately and is not mixed with the strict three-case Dice mean.
 

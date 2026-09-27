@@ -54,6 +54,23 @@ def test_valid_aligned_triplet_and_physical_volume(tmp_path: Path) -> None:
     assert result.reference_empty is False
 
 
+def test_sheared_affine_uses_determinant_not_spacing_product(tmp_path: Path) -> None:
+    segmentation = np.zeros((3, 4, 5), dtype=np.uint8)
+    segmentation[0, 0, 0] = 1
+    shear = np.array(
+        [[2.0, 1.0, 0.0, 0.0], [0.0, 3.0, 0.0, 0.0], [0.0, 0.0, 4.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+    )
+    ct, pet, seg = _triplet(tmp_path, segmentation=segmentation)
+    for path, data in ((ct, np.zeros((3, 4, 5))), (pet, np.ones((3, 4, 5))), (seg, segmentation)):
+        _write(path, data, shear)
+
+    result = audit_examination(ct, pet, seg)
+
+    assert result.ok
+    assert result.voxel_volume_ml == pytest.approx(0.024)
+    assert result.reference_volume_ml == pytest.approx(0.024)
+
+
 def test_reference_geometry_mismatch_has_no_physical_volume(tmp_path: Path) -> None:
     segmentation = np.zeros((3, 4, 5), dtype=np.uint8)
     segmentation[0, 0, :2] = 1

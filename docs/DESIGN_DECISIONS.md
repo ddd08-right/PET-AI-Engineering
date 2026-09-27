@@ -9,3 +9,6 @@
 7. Risk--coverage models fixed-budget selective review: highest predicted-risk cases leave automatic handling first.
 8. Synthetic arrays test mathematics and engineering behavior. They do not establish clinical validation, clinical utility, or external generalization.
 9. No additional network architecture was added because v0.3 isolates the quantification and evaluation layer downstream of existing segmentation outputs.
+10. The spacing-only volume API remains for compatibility and assumes orthogonal voxel axes. NIfTI-facing volume uses `abs(det(affine[:3, :3])) / 1000` after unit and coded-transform validation, so shear and reflection are handled without presentation rounding.
+11. Physical NIfTI evaluation requires at least one coded qform/sform. This is a conservative project policy, not a statement that every otherwise legal NIfTI must contain matching coded transforms.
+12. Training-wrapper seeds are declarations unless runtime evidence establishes the effective trainer state. A manifest failure after a successful trainer run is an overall wrapper failure; a trainer failure retains its original exit code.

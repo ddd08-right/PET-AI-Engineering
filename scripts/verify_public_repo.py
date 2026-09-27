@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import binascii
 import re
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -50,6 +52,10 @@ EXCLUDED_DIRS = {
     "weights",
     "logs",
 }
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+PNG_TEXT_CHUNKS = {b"tEXt", b"zTXt", b"iTXt"}
+MAX_PNG_BYTES = 100 * 1024 * 1024
+MAX_PNG_CHUNK_BYTES = 64 * 1024 * 1024
 
 
 def git_tracked_files(repo_root: Path) -> list[Path] | None:
@@ -135,6 +141,87 @@ def scan_text(path: Path, repo_root: Path) -> list[str]:
     return findings
 
 
+def scan_png(path: Path) -> list[str]:
+    """Validate basic PNG structure without decoding image or compressed data."""
+    try:
+        size = path.stat().st_size
+        if size > MAX_PNG_BYTES:
+            return [f"PNG exceeds {MAX_PNG_BYTES} byte scan limit"]
+        data = path.read_bytes()
+    except OSError as exc:
+        return [f"could not read PNG: {exc}"]
+    if not data.startswith(PNG_SIGNATURE):
+        return ["invalid PNG signature"]
+
+    findings: list[str] = []
+    offset = len(PNG_SIGNATURE)
+    chunk_index = 0
+    saw_idat = False
+    saw_iend = False
+    while offset < len(data):
+        if len(data) - offset < 12:
+            findings.append("truncated PNG chunk")
+            break
+        length = struct.unpack(">I", data[offset : offset + 4])[0]
+        chunk_type = data[offset + 4 : offset + 8]
+        if length > MAX_PNG_CHUNK_BYTES:
+            findings.append(f"PNG chunk exceeds {MAX_PNG_CHUNK_BYTES} byte scan limit")
+            break
+        end = offset + 12 + length
+        if end > len(data):
+            findings.append("PNG chunk length exceeds file bounds")
+            break
+        payload = data[offset + 8 : offset + 8 + length]
+        expected_crc = struct.unpack(">I", data[offset + 8 + length : end])[0]
+        actual_crc = binascii.crc32(chunk_type + payload) & 0xFFFFFFFF
+        if actual_crc != expected_crc:
+            findings.append(f"PNG chunk {chunk_type!r} has invalid CRC")
+        if chunk_index == 0 and (chunk_type != b"IHDR" or length != 13):
+            findings.append("PNG first chunk is not a 13-byte IHDR")
+        if chunk_type == b"IHDR" and length == 13:
+            width, height = struct.unpack(">II", payload[:8])
+            if width == 0 or height == 0:
+                findings.append("PNG has zero width or height")
+        if chunk_type in PNG_TEXT_CHUNKS:
+            findings.append(f"PNG text metadata chunk {chunk_type.decode('ascii')} is not allowed")
+        if chunk_type == b"IDAT":
+            saw_idat = True
+        if chunk_type == b"IEND":
+            if length != 0:
+                findings.append("PNG IEND chunk is not empty")
+            saw_iend = True
+            offset = end
+            if offset != len(data):
+                findings.append("PNG has trailing data after IEND")
+            break
+        offset = end
+        chunk_index += 1
+    if not saw_idat:
+        findings.append("PNG has no IDAT chunk")
+    if not saw_iend:
+        findings.append("PNG has no IEND chunk")
+    return findings
+
+
+def scan_svg(path: Path, repo_root: Path) -> list[str]:
+    findings = scan_text(path, repo_root)
+    try:
+        text = path.read_text(encoding="utf-8", errors="strict")
+    except (OSError, UnicodeError) as exc:
+        return findings + [f"could not read SVG as UTF-8 text: {exc}"]
+    checks = (
+        (re.compile(r"(?is)<\s*script\b"), "SVG script element is not allowed"),
+        (re.compile(r"(?is)\bon\w+\s*="), "SVG event-handler attribute is not allowed"),
+        (re.compile(r"(?is)\b(?:href|src)\s*=\s*['\"]\s*(?!#)(?:https?:|file:|//)"), "SVG external resource reference is not allowed"),
+        (re.compile(r"(?is)\b(?:href|src)\s*=\s*['\"]\s*data:"), "SVG embedded data payload is not allowed"),
+        (re.compile(r"(?is)<!DOCTYPE|<!ENTITY"), "SVG DTD/entity declaration is not allowed"),
+    )
+    for pattern, message in checks:
+        if pattern.search(text):
+            findings.append(message)
+    return findings
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Guardrail scan for public repository content. This is not a formal PHI detector."
@@ -164,7 +251,13 @@ def main() -> int:
             errors.append(f"{rel}: blocked medical/model artifact extension")
             continue
         if path.is_file():
-            for finding in scan_text(path, repo_root):
+            if path.suffix.lower() == ".png":
+                findings = scan_png(path)
+            elif path.suffix.lower() == ".svg":
+                findings = scan_svg(path, repo_root)
+            else:
+                findings = scan_text(path, repo_root)
+            for finding in findings:
                 errors.append(f"{rel}: {finding}")
 
     for error in errors:

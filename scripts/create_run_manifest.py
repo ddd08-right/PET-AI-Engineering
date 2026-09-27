@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import warnings
 from pathlib import Path
 
 from pet_ai.reproducibility.run_manifest import create_run_manifest, write_run_manifest
@@ -18,19 +19,34 @@ def main() -> int:
     parser.add_argument("--split-manifest")
     parser.add_argument("--config")
     parser.add_argument("--checkpoint")
-    parser.add_argument("--seed", type=int)
+    seed_group = parser.add_mutually_exclusive_group()
+    seed_group.add_argument("--declared-seed", type=int)
+    seed_group.add_argument("--seed", type=int, help="Deprecated alias for --declared-seed")
+    parser.add_argument("--effective-seed", type=int)
+    parser.add_argument("--seed-verification-status")
     parser.add_argument("--exit-status", type=int)
     parser.add_argument("--notes")
     parser.add_argument("command", nargs="*", help="Command being recorded")
     args = parser.parse_args()
 
+    declared_seed = args.declared_seed
+    if args.seed is not None:
+        warnings.warn(
+            "--seed is deprecated; it records a declaration only and does not prove trainer state",
+            FutureWarning,
+            stacklevel=1,
+        )
+        declared_seed = args.seed
     manifest = create_run_manifest(
         repo_root=args.repo_root,
         dataset_manifest=optional_path(args.dataset_manifest),
         split_manifest=optional_path(args.split_manifest),
         config=optional_path(args.config),
         checkpoint=optional_path(args.checkpoint),
-        seed=args.seed,
+        seed=None,
+        declared_seed=declared_seed,
+        effective_seed=args.effective_seed,
+        seed_verification_status=args.seed_verification_status,
         command=args.command,
         exit_status=args.exit_status,
         notes=args.notes,

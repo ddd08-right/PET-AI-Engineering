@@ -72,6 +72,21 @@ def test_conflicting_valid_qform_and_sform_are_rejected(tmp_path):
         load_nifti_geometry(path)
 
 
+def test_persisted_image_with_both_transform_codes_zero_is_rejected(tmp_path):
+    path = tmp_path / "fallback_only.nii.gz"
+    image = nib.Nifti1Image(np.zeros((4, 4, 4), dtype=np.float32), np.eye(4))
+    image.header.set_xyzt_units("mm")
+    image.set_qform(np.eye(4), code=0)
+    image.set_sform(np.eye(4), code=0)
+    nib.save(image, path)
+
+    reloaded = nib.load(path)
+    assert int(reloaded.get_qform(coded=True)[1]) == 0
+    assert int(reloaded.get_sform(coded=True)[1]) == 0
+    with pytest.raises(ValueError, match="at least one coded qform or sform"):
+        load_nifti_geometry(path)
+
+
 def test_only_one_valid_coded_transform_is_accepted(tmp_path):
     path = tmp_path / "sform_only.nii.gz"
     image = nib.Nifti1Image(np.zeros((4, 4, 4), dtype=np.float32), np.eye(4))
@@ -81,3 +96,17 @@ def test_only_one_valid_coded_transform_is_accepted(tmp_path):
     nib.save(image, path)
 
     assert load_nifti_geometry(path).spacing == pytest.approx((1.0, 1.0, 1.0))
+
+
+def test_qform_only_and_two_consistent_coded_transforms_are_accepted(tmp_path):
+    qform_only = tmp_path / "qform_only.nii.gz"
+    both = tmp_path / "both.nii.gz"
+    for path, sform_code in ((qform_only, 0), (both, 1)):
+        image = nib.Nifti1Image(np.zeros((4, 4, 4), dtype=np.float32), np.eye(4))
+        image.header.set_xyzt_units("mm")
+        image.set_qform(np.eye(4), code=1)
+        image.set_sform(np.eye(4), code=sform_code)
+        nib.save(image, path)
+
+    assert load_nifti_geometry(qform_only).spacing == pytest.approx((1.0, 1.0, 1.0))
+    assert load_nifti_geometry(both).spacing == pytest.approx((1.0, 1.0, 1.0))

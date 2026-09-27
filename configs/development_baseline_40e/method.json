@@ -1,0 +1,32 @@
+{
+  "evidence_status": "PARTIAL_RECIPE",
+  "dataset": {
+    "required_argument": true,
+    "channels": {"0": "CT", "1": "PET"},
+    "label_1": "lesion foreground",
+    "split_schema": {
+      "train": ["deidentified_case_key"],
+      "val": ["deidentified_case_key"]
+    },
+    "private_split_membership_included": false
+  },
+  "nnunet": {
+    "configuration": "3d_fullres",
+    "plans": "nnUNetPlans_6G",
+    "trainer": "nnUNetTrainer_DevelopmentBaseline40epochs",
+    "fold": 0,
+    "epochs": 40,
+    "patch_size": [160, 112, 96],
+    "batch_size": 2,
+    "learning_rate": "upstream PolyLR bound to the 40-epoch horizon",
+    "loss": "upstream nnU-Net trainer loss",
+    "data_loader_processes": 0
+  },
+  "sampling": {
+    "slot_0": "uniform case with no class-1 annotation coordinates; force_fg=false; patch bbox delegates to upstream get_bbox",
+    "slot_1": "uniform positive case; foreground-force probability 0.82"
+  },
+  "declared_seed": 20260924,
+  "effective_seed_evidence": "recorded by the private launcher, not established by the public wrapper",
+  "historical_recovery": "not reproduced; checkpoint-specific guard and RNG-history limitation remain private-run evidence"
+}

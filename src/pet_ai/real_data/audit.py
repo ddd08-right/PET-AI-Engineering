@@ -11,7 +11,7 @@ import numpy as np
 
 from pet_ai.qc.geometry import compare_nifti_geometry, load_nifti_geometry
 from pet_ai.qc.labels import validate_segmentation_labels
-from pet_ai.quantification.volume import mask_volume_ml, voxel_volume_ml
+from pet_ai.quantification.volume import affine_voxel_volume_ml, mask_volume_from_affine_ml
 
 
 @dataclass(frozen=True)
@@ -125,10 +125,11 @@ def audit_examination(
         spacing = ct_geometry.spacing
     if ct_geometry_valid_for_volume:
         try:
-            per_voxel_ml = voxel_volume_ml(spacing)
+            affine_mm = np.asarray(ct_geometry.affine, dtype=float)
+            per_voxel_ml = affine_voxel_volume_ml(affine_mm)
             if label_result.ok and reference_geometry is not None and reference_geometry.ok:
-                reference_volume = mask_volume_ml(
-                    loaded["reference segmentation"][1], spacing
+                reference_volume = mask_volume_from_affine_ml(
+                    loaded["reference segmentation"][1], affine_mm
                 )
         except ValueError as error:
             failures.append(f"physical volume: {error}")

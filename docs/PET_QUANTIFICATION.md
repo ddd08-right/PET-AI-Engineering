@@ -1,13 +1,18 @@
 # PET Quantification Boundaries
 
 The v0.3 utilities convert a three-dimensional binary mask into a generic
-physical volume. For spacing in `(D, H, W)` millimetres:
+physical volume. For orthogonal voxel axes with spacing in `(D, H, W)` millimetres:
 
 `voxel volume (mL) = spacing_D * spacing_H * spacing_W / 1000`
 
-The division follows from `1000 mm^3 = 1 mL`. Mask volume is foreground voxel
+The division follows from `1000 mm^3 = 1 mL`. Spacing alone cannot represent a
+sheared grid. When a validated voxel-to-millimetre affine is available, use
+`abs(det(affine[:3, :3])) / 1000` mL instead. Mask volume is foreground voxel
 count multiplied by voxel volume. Empty masks have volume `0.0 mL`. Spacing
-must contain exactly three finite, strictly positive values.
+must contain exactly three finite, strictly positive values. The array helper
+validates numeric arguments only; it cannot validate NIfTI units, transform
+provenance, or anatomical alignment. Those checks belong to the NIfTI geometry
+and audit entry points.
 
 Boolean masks are accepted. Integer and floating masks must contain only
 explicit binary values `{0, 1}`. Probabilistic masks are rejected rather than

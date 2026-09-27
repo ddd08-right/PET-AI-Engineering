@@ -13,17 +13,18 @@ unavailable evidence remains null or `NOT_AVAILABLE`.
 
 ## Real-data preflight: staged status
 
-Phase 2 found authorized local evidence for FDG-PET-CT-Lesions Version 2 and
-verified the collection identity and DOI against the official
+At the historical Phase 2 checkpoint, authorized local evidence had been found
+for FDG-PET-CT-Lesions Version 2 and the collection identity and DOI had been
+verified against the official
 [TCIA collection page](https://www.cancerimagingarchive.net/collection/fdg-pet-ct-lesions/).
 The local conversion manifest exposes four available CT/PET/reference triplets.
 Strict read-only QC found all four readable with finite non-empty binary
-references, but all four NIfTI headers have unknown spatial units. Physical
-volume remains blocked; historical values that assumed millimetres were not
-promoted to current verified results.
+references, but all four NIfTI headers had unknown spatial units. Physical
+volume was blocked at that stage; historical values that assumed millimetres
+were not promoted then.
 
-The OOF19 records define 19 grouped examinations across four folds. Current
-artifacts contain five Fold 0 predictions with prediction/checkpoint hashes;
+The OOF19 records defined 19 grouped examinations across four folds. At that
+stage, artifacts contained five Fold 0 predictions with prediction/checkpoint hashes;
 the other 14 records are explicitly `NOT_GENERATED`. The five prediction and
 reference artifacts were relocated by recorded SHA256 and are readable,
 finite, binary, and numerically same-grid. Their spatial units are unknown, so
@@ -31,22 +32,23 @@ no strict segmentation metric or physical volume was calculated. No patient
 row, clinical metric, confidence interval, or independent-test conclusion is
 published from these checks.
 
-Phase 3 traced the unknown-unit origin without changing source files. Direct
+At the historical Phase 3 checkpoint, the unknown-unit origin was traced
+without changing source files. Direct
 DICOM geometry checks used Pixel Spacing, Image Orientation, and projected
 Image Position differences; SliceThickness was not substituted for inter-slice
 distance. DICOM LPS coordinates were converted to RAS before comparing world
 corners. The intermediate CT/PET NIfTI files retain an explicit millimetre
 unit, while SUV, resampled CT, SEG, and downstream OOF outputs retain the same
-numeric millimetre geometry but omit the NIfTI unit label. These files are
-classified `UNIT_VERIFIED` for a metadata-only derived-copy migration. No
-derived image was written because explicit write authorization has not yet
-been granted.
+numeric millimetre geometry but omit the NIfTI unit label. These files were
+classified `UNIT_VERIFIED` for a metadata-only derived-copy migration. At that
+stage no derived image had yet been written; the later authorized Phase 4
+record below supersedes that temporary blocker.
 
 The five existing OOF files are one prediction for each of five distinct Fold
 0 held-out examinations from one checkpoint. They are not five members for one
 case and not a five-seed ensemble. The historical protocol did not explicitly
-set a seed. Single-member Dice/quantification can be evaluated only after the
-strict unit-tagged derived copies exist; ensemble disagreement, CV/SD, and
+set a seed. Single-member Dice/quantification was deferred until strict
+unit-tagged derived copies existed; ensemble disagreement, CV/SD, and
 reliability AURC remain unavailable.
 ## Phase 4 authorized metadata migration and technical evaluation (2026-09-23)
 

@@ -4,12 +4,47 @@ import numpy as np
 import pytest
 
 from pet_ai.quantification import (
+    affine_voxel_volume_ml,
+    mask_volume_from_affine_ml,
     mask_volume_ml,
     masked_max,
     masked_mean,
     uptake_volume_product,
     voxel_volume_ml,
 )
+
+
+def test_affine_volume_handles_orthogonal_shear_and_reflection():
+    orthogonal = np.diag([2.0, 3.0, 4.0, 1.0])
+    shear = np.array([[2.0, 1.0, 0.0, 0.0], [0.0, 3.0, 0.0, 0.0], [0.0, 0.0, 4.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+    reflection = np.diag([-2.0, 3.0, 4.0, 1.0])
+
+    assert affine_voxel_volume_ml(orthogonal) == pytest.approx(0.024)
+    assert affine_voxel_volume_ml(shear) == pytest.approx(0.024)
+    assert affine_voxel_volume_ml(reflection) == pytest.approx(0.024)
+    assert mask_volume_from_affine_ml(np.ones((1, 1, 2)), shear) == pytest.approx(0.048)
+
+
+def test_metre_conversion_upstream_matches_millimetre_affine_volume():
+    affine_m = np.diag([0.002, 0.003, 0.004, 1.0])
+    affine_mm = affine_m.copy()
+    affine_mm[:3, :] *= 1000.0
+
+    assert affine_voxel_volume_ml(affine_mm) == pytest.approx(0.024)
+
+
+@pytest.mark.parametrize(
+    "affine",
+    (
+        np.eye(3),
+        np.full((4, 4), np.nan),
+        np.diag([1.0, 1.0, 0.0, 1.0]),
+        np.array([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 1.0]]),
+    ),
+)
+def test_invalid_affine_volume_inputs_are_rejected(affine):
+    with pytest.raises(ValueError):
+        affine_voxel_volume_ml(affine)
 
 
 def test_one_thousand_unit_voxels_equal_one_ml():

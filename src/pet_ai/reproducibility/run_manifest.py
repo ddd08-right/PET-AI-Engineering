@@ -19,6 +19,7 @@ NOT_AVAILABLE = "NOT_AVAILABLE"
 
 @dataclass(frozen=True)
 class RunManifest:
+    schema_version: int
     run_id: str
     timestamp: str
     git_commit: str | None
@@ -30,6 +31,9 @@ class RunManifest:
     platform: str
     gpu_name: str | None
     seed: int | None
+    declared_seed: int | None
+    effective_seed: int | None
+    seed_verification_status: str
     command: list[str]
     exit_status: int | None
     checkpoint_sha256: str | None
@@ -101,13 +105,23 @@ def create_run_manifest(
     config: Path | None,
     checkpoint: Path | None,
     seed: int | None,
+    declared_seed: int | None = None,
+    effective_seed: int | None = None,
+    seed_verification_status: str | None = None,
     command: list[str],
     exit_status: int | None,
     notes: str | None = None,
     run_id: str | None = None,
     gpu_name: str | None = None,
 ) -> RunManifest:
+    if seed is not None and declared_seed is not None and seed != declared_seed:
+        raise ValueError("seed compatibility value conflicts with declared_seed")
+    declaration = declared_seed if declared_seed is not None else seed
+    verification = seed_verification_status or (
+        "VERIFIED_EFFECTIVE" if effective_seed is not None else "UNVERIFIED_DECLARATION_ONLY"
+    )
     return RunManifest(
+        schema_version=2,
         run_id=run_id or f"run-{uuid.uuid4().hex}",
         timestamp=datetime.now(timezone.utc).isoformat(),
         git_commit=current_git_commit(repo_root),
@@ -118,7 +132,10 @@ def create_run_manifest(
         python_version=sys.version,
         platform=platform.platform(),
         gpu_name=gpu_name if gpu_name is not None else detect_gpu_name(),
-        seed=seed,
+        seed=declaration,
+        declared_seed=declaration,
+        effective_seed=effective_seed,
+        seed_verification_status=verification,
         command=command,
         exit_status=exit_status,
         checkpoint_sha256=sha256_or_not_available(checkpoint),

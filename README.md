@@ -3,20 +3,17 @@
 
 ![CI](https://github.com/ddd08-right/PET-AI-Engineering/actions/workflows/ci.yml/badge.svg)
 
-A public-safe engineering path from PET/CT medical imaging and native PyTorch
-3D segmentation through physical quantification, patient-level quantitative
-error, reliability ranking, and risk--coverage selective review.
+Three evidence tracks are intentionally separate:
 
-```mermaid
-flowchart LR
-    A[PET/CT] --> B[QC / patient-level split]
-    B --> C[Native PyTorch 3D segmentation]
-    C --> D[Physical quantification]
-    D --> E[Patient-level quantitative error]
-    E --> F[Reliability ranking]
-    F --> G[Risk-coverage / selective review]
-    G --> H[Reproducibility / testing]
-```
+| Track | Evidence | Boundary |
+| --- | --- | --- |
+| Native PyTorch teaching baseline | Synthetic tensors and CPU tests | Engineering education; no patient performance. |
+| nnU-Net development case | One seed, fold 0, five development-validation cases | Real protected predictions; not independent testing or clinical validation. |
+| Reliability utilities | Synthetic mathematical and engineering checks | A real-patient reliability study and AURC analysis are not complete. |
+
+![Evidence overview showing three separate tracks: a synthetic native PyTorch baseline, a five-case single-seed/fold nnU-Net development case, and synthetic reliability validation. Independent testing, external validation, and a real-patient reliability study are incomplete.](docs/figures/evidence_overview.svg)
+
+*Figure 1. Repository evidence overview. Arrows show computations within each track; engineering PASS labels do not imply clinical validity. [PNG preview](docs/figures/evidence_overview.png).*
 
 ## Why this repository exists
 
@@ -29,7 +26,7 @@ endpoint. It is not a clinical validation study.
 
 - Native PyTorch 3D segmentation: dataset -> 3D U-Net -> loss -> backward pass -> optimizer update.
 - Patient-level split checks and PET/CT geometry and segmentation-label QC.
-- Physical binary-mask volume calculation from voxel spacing in millimetres.
+- Physical binary-mask volume from a millimetre affine determinant; the legacy spacing-only API is explicitly limited to orthogonal voxel axes.
 - Patient-level quantitative-error and reliability utilities with explicit edge-case policies.
 - Risk--coverage evaluation with fixed-seed random, non-deployable best-case reference, and reverse controls.
 - Automated tests, CI workflows, a public-repository guardrail, provenance utilities, and synthetic demos.
@@ -63,7 +60,8 @@ This repository is intentionally modest: it demonstrates public-safe software en
 
 ## 3. Architecture / pipeline
 
-Manifest -> split validation -> PET/CT geometry QC -> segmentation label QC -> 3D segmentation -> physical quantification -> patient-level reliability -> risk--coverage -> run provenance and failure analysis.
+The modules can support manifest -> QC -> evaluation workflows, but the three
+evidence tracks above were not executed as one patient-level end-to-end study.
 
 Each stage has a small module under `src/pet_ai/` and a corresponding test or demo call. The scripts in `scripts/` are thin command-line entry points.
 
@@ -71,7 +69,7 @@ Each stage has a small module under `src/pet_ai/` and a corresponding test or de
 
 ```powershell
 python -m pip install -e ".[test]"
-python -m pytest -q
+python -m pytest -q -m "not pytorch"
 python -m ruff check .
 python scripts/verify_public_repo.py
 ```
@@ -117,11 +115,20 @@ Development-exposed data must not be described as an independent test set.
 The QC modules report problems. They do not silently resample, repair, or exclude cases.
 NIfTI geometry requires an explicit recognized spatial unit and is normalized
 to millimetres for comparison. Same-grid status allows index-wise comparison;
-it does not prove anatomical registration.
+it does not prove anatomical registration. Project policy also requires at
+least one coded qform or sform. A fallback affine with both codes zero is not
+accepted as a verified physical-space source; two valid but conflicting coded
+forms are rejected, while one valid form is sufficient.
 
 ## 8. Voxel-level segmentation evaluation
 
-`pet_ai.evaluation.segmentation` reports TP, FP, FN, Dice, FPV_mL, and FNV_mL. For empty ground truth, Dice is undefined (`NaN`) rather than forced to 1. Negative cases should be reviewed using false-positive volume.
+`pet_ai.evaluation.segmentation` reports TP, FP, FN, Dice, FPV_mL, and FNV_mL.
+The standard formula gives Dice 0 for empty reference/non-empty prediction and
+0/0 only when both are empty. This project's strict aggregation policy excludes
+all empty-reference cases, retaining the historical `NaN`/`null` and
+`UNDEFINED_EMPTY_GT` API label. It is therefore a non-empty-reference Dice,
+not a claim that every empty-reference Dice is mathematically undefined.
+Negative cases should be reviewed using false-positive volume.
 Inputs must be finite, strictly binary, same-shaped 3D arrays. The NIfTI entry
 point additionally rejects physical-grid mismatch before computing metrics.
 
@@ -131,7 +138,10 @@ point additionally rejects physical-grid mismatch before computing metrics.
 
 ## 10. Reproducibility
 
-`pet_ai.reproducibility.hashing` computes SHA256 file hashes. `pet_ai.reproducibility.run_manifest` records command, exit status, Git commit when available, file hashes, Python/platform details, seed, optional GPU name, optional checkpoint hash, and notes.
+`pet_ai.reproducibility.hashing` computes SHA256 file hashes.
+`pet_ai.reproducibility.run_manifest` distinguishes a declared/requested seed
+from an effective seed and its verification status. A declaration from the
+PowerShell wrapper is not evidence that trainer RNG state was controlled.
 
 ## 11. Debugging / failure analysis
 
@@ -149,6 +159,30 @@ It includes real predictions and evaluation for the final checkpoint and the
 checkpoint selected by the online EMA pseudo-Dice rule across five development
 validation cases. The protected predictions and per-case evidence are not
 published in this repository.
+
+The public-safe method extraction and command/output contract are documented in
+[`configs/development_baseline_40e/README.md`](configs/development_baseline_40e/README.md).
+It is a `PARTIAL_RECIPE`: nnU-Net/PyTorch remain external historical
+dependencies, protected data and weights are absent, and this repository did
+not rerun training or inference.
+
+The sampler diagram distinguishes case-slot assignment from upstream spatial
+patch selection: [midpoint sampling method](docs/figures/midpoint_sampling.svg)
+([PNG preview](docs/figures/midpoint_sampling.png)). The `0.82` value is a
+slot-1 foreground-forcing probability, not a positive-case sampling rate.
+
+Generate the self-contained SVG figures with Python only (no browser required):
+
+```bash
+python scripts/render_public_figures.py
+```
+
+PNG previews are optional. To regenerate them, explicitly supply a local
+Edge/Chromium executable; a browser launch or render failure returns an error:
+
+```powershell
+python scripts/render_public_figures.py --edge /path/to/chromium
+```
 
 ## 13. Research extensions - PLANNED ONLY
 

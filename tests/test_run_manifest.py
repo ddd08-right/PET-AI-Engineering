@@ -53,3 +53,29 @@ def test_run_manifest_contains_required_provenance_fields(tmp_path):
     assert data["dataset_manifest_sha256"] is None
     assert data["git_dirty"] is None
     assert {"numpy", "nibabel", "PyYAML"} <= data["dependency_versions"].keys()
+    assert data["schema_version"] == 2
+    assert data["seed"] == 7
+    assert data["declared_seed"] == 7
+    assert data["effective_seed"] is None
+    assert data["seed_verification_status"] == "UNVERIFIED_DECLARATION_ONLY"
+
+
+def test_effective_seed_requires_an_explicit_verification_claim(tmp_path):
+    manifest = create_run_manifest(
+        repo_root=tmp_path,
+        dataset_manifest=None,
+        split_manifest=None,
+        config=None,
+        checkpoint=None,
+        seed=None,
+        declared_seed=11,
+        effective_seed=11,
+        seed_verification_status="VERIFIED_BY_MOCK_TRAINER",
+        command=["fake-trainer"],
+        exit_status=0,
+        gpu_name=None,
+    )
+
+    assert manifest.declared_seed == 11
+    assert manifest.effective_seed == 11
+    assert manifest.seed_verification_status == "VERIFIED_BY_MOCK_TRAINER"

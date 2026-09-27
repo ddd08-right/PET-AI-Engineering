@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title desc">
+<title id="title">Development midpoint sampler</title>
+<desc id="desc">Case selection separates cases with and without class-1 annotation coordinates into fixed batch slots. Slot 1 uses a 0.82 foreground-force probability. Patch position is delegated to upstream nnU-Net get_bbox.</desc>
+<defs>
+<pattern id="control-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+<rect width="9" height="9" fill="#f0f1f2"/>
+<line x1="0" y1="0" x2="0" y2="9" stroke="#929aa2" stroke-width="3"/>
+</pattern>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+<path d="M0,0 L10,5 L0,10 z" fill="#718096"/>
+</marker>
+</defs>
+<rect x="0" y="0" width="1600" height="1040" fill="#ffffff"/>
+<style>text{font-family:sans-serif;fill:#263545} .title{font-size:34px;font-weight:700} .subtitle{font-size:18px;fill:#586879} .section{font-size:23px;font-weight:700} .body{font-size:18px} .small{font-size:15px;fill:#586879} .label{font-size:16px;font-weight:700} .metric{font-size:16px;font-variant-numeric:tabular-nums}</style>
+<text x="64.0" y="68.0" class="title" text-anchor="start">Development midpoint sampler</text>
+<text x="64.0" y="102.0" class="subtitle" text-anchor="start">Case selection and patch selection are separate steps</text>
+<rect x="64.0" y="150.0" width="1472.0" height="554.0" rx="18" fill="#ffffff" stroke="#d9e0e7" stroke-width="2"/>
+<text x="96.0" y="198.0" class="section" text-anchor="start">1  Case-level pools and slot assignment</text>
+<text x="96.0" y="232.0" class="small" text-anchor="start">Pool membership comes from preprocessed class_locations for label 1.</text>
+<rect x="100.0" y="274.0" width="370.0" height="112.0" rx="14" fill="#edf3f8" stroke="#527da5" stroke-width="2"/>
+<text x="124.0" y="314.0" class="label" text-anchor="start">No class-1 annotation coordinates</text>
+<text x="124.0" y="347.0" class="small" text-anchor="start">annotation-defined stratum; not clinical absence</text>
+<line x1="472.0" y1="330.0" x2="630.0" y2="330.0" stroke="#527da5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="650.0" y="278.0" width="290.0" height="104.0" rx="14" fill="#f4f7fa" stroke="#527da5" stroke-width="2"/>
+<text x="795.0" y="319.0" class="label" text-anchor="middle">Uniform case selection</text>
+<text x="795.0" y="349.0" class="small" text-anchor="middle">slot 0</text>
+<line x1="944.0" y1="330.0" x2="1040.0" y2="330.0" stroke="#527da5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1062.0" y="278.0" width="396.0" height="104.0" rx="14" fill="#ffffff" stroke="#527da5" stroke-width="2"/>
+<text x="1260.0" y="319.0" class="label" text-anchor="middle">force_fg = False</text>
+<text x="1260.0" y="349.0" class="small" text-anchor="middle">always for slot 0</text>
+<rect x="100.0" y="416.0" width="370.0" height="112.0" rx="14" fill="#edf5f3" stroke="#5b8e88" stroke-width="2"/>
+<text x="124.0" y="456.0" class="label" text-anchor="start">Has class-1 annotation coordinates</text>
+<text x="124.0" y="489.0" class="small" text-anchor="start">annotation-defined stratum</text>
+<line x1="472.0" y1="472.0" x2="630.0" y2="472.0" stroke="#5b8e88" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="650.0" y="420.0" width="290.0" height="104.0" rx="14" fill="#f1f7f5" stroke="#5b8e88" stroke-width="2"/>
+<text x="795.0" y="461.0" class="label" text-anchor="middle">Uniform case selection</text>
+<text x="795.0" y="491.0" class="small" text-anchor="middle">slot 1</text>
+<line x1="944.0" y1="472.0" x2="1040.0" y2="472.0" stroke="#5b8e88" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1062.0" y="420.0" width="396.0" height="104.0" rx="14" fill="#ffffff" stroke="#5b8e88" stroke-width="2"/>
+<text x="1260.0" y="461.0" class="label" text-anchor="middle">Draw uniform RNG value</text>
+<text x="1260.0" y="491.0" class="small" text-anchor="middle">compare with 0.82 threshold</text>
+<line x1="1260.0" y1="526.0" x2="1260.0" y2="566.0" stroke="#d18852" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1062.0" y="568.0" width="396.0" height="74.0" rx="12" fill="#fbf1e9" stroke="#d18852" stroke-width="2"/>
+<text x="1260.0" y="599.0" class="label" text-anchor="middle">RNG &lt; 0.82 → force_fg = True</text>
+<text x="1260.0" y="625.0" class="small" text-anchor="middle">otherwise → force_fg = False</text>
+<rect x="64.0" y="736.0" width="1472.0" height="238.0" rx="16" fill="#f7f8fa" stroke="#d9e0e7" stroke-width="2"/>
+<rect x="96.0" y="758.0" width="1408.0" height="64.0" rx="12" fill="#ffffff" stroke="#718096" stroke-width="2"/>
+<text x="800.0" y="785.0" class="label" text-anchor="middle">2  After case selection, both slots delegate patch location to upstream nnU-Net get_bbox</text>
+<text x="800.0" y="810.0" class="small" text-anchor="middle">The case is already chosen; get_bbox selects a spatial patch within that case.</text>
+<path d="M1458 330 H1490 V726 H800 V752" fill="none" stroke="#718096" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1458 605 H1520 V732 H800 V752" fill="none" stroke="#718096" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="96.0" y="858.0" class="section" text-anchor="start">Upstream patch behavior</text>
+<rect x="96.0" y="874.0" width="158.0" height="34" rx="17" fill="#f5e5d9"/>
+<text x="175.0" y="897.0" class="label" text-anchor="middle" fill="#23364d">force_fg=True</text>
+<text x="278.0" y="898.0" class="body" text-anchor="start">get_bbox centers a patch on a selected foreground coordinate when one is available.</text>
+<rect x="96.0" y="918.0" width="158.0" height="34" rx="17" fill="#e8edf2"/>
+<text x="175.0" y="941.0" class="label" text-anchor="middle" fill="#23364d">force_fg=False</text>
+<text x="278.0" y="942.0" class="small" text-anchor="start">Without ignore-label mode, random-box branch; ignore-label handling can change it.</text>
+<text x="96.0" y="964.0" class="small" text-anchor="start">0.82 controls slot-1 foreground forcing, not positive-case selection or disease prevalence.</text>
+</svg>

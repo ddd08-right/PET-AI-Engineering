@@ -19,6 +19,7 @@
     "notes"
   ],
   "properties": {
+    "schema_version": {"type": "integer", "minimum": 1},
     "run_id": {"type": "string"},
     "timestamp": {"type": "string"},
     "git_commit": {"type": ["string", "null"]},
@@ -30,6 +31,9 @@
     "platform": {"type": "string"},
     "gpu_name": {"type": ["string", "null"]},
     "seed": {"type": ["integer", "null"]},
+    "declared_seed": {"type": ["integer", "null"]},
+    "effective_seed": {"type": ["integer", "null"]},
+    "seed_verification_status": {"type": "string"},
     "command": {"type": "array", "items": {"type": "string"}},
     "exit_status": {"type": ["integer", "null"]},
     "checkpoint_sha256": {"type": ["string", "null"]},
