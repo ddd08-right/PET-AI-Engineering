@@ -1,27 +1,56 @@
-
 # Architecture
 
-The public release is organized as a small pipeline of testable modules. Each module has one responsibility and returns structured results rather than silently changing data.
+The repository contains three evidence tracks that share validation,
+evaluation, and provenance utilities. They should not be read as one completed
+real-patient pipeline.
 
-## Pipeline
+## Evidence tracks
 
-manifest -> split validation -> image QC -> label QC -> voxel evaluation -> lesion evaluation -> provenance -> failure analysis
+| Track | Main path | Status and boundary |
+| --- | --- | --- |
+| Native PyTorch teaching baseline | Synthetic `torch.utils.data.Dataset` → compact 3D U-Net → loss → backward → optimizer update | `ENGINEERING_SMOKE`; synthetic tensors and CPU checks, with no patient-performance claim. |
+| nnU-Net development case | Protected CT/PET inputs → upstream nnU-Net plus public sampler adaptation → five-case aggregate evaluation | `DEVELOPMENT_EXPOSED`; one seed, fold 0, and no independent or external test. The published method is a post-hoc `PARTIAL_RECIPE`. |
+| Reliability toolkit | Errors and risk scores → ranking → risk–coverage/AURC | Synthetic mathematical validation; a real-patient reliability study is incomplete. |
 
-## Module responsibilities
+All three tracks can use the same foundations: public-safe manifest and split
+validation, NIfTI geometry and label QC, segmentation and quantification
+metrics, SHA256 hashing, run manifests, and failure records. Sharing utilities
+does not raise one track's evidence status to that of another.
 
-| Stage | Module | Inputs | Outputs | Responsibility |
-| --- | --- | --- | --- | --- |
-| Manifest | `pet_ai.data.manifest` | Public-safe CSV rows | `ManifestValidationResult` | Check required fields, duplicate case IDs, modality availability, allowed labels/splits, and forbidden private fields. |
-| Split validation | `pet_ai.data.split_validation` | Manifest rows | `SplitValidationResult` | Detect patient-level leakage across train/validation/test. |
-| Image QC | `pet_ai.qc.geometry` | NIfTI image paths | `GeometryQCResult` | Compare shape, spacing, orientation, and affine. |
-| Label QC | `pet_ai.qc.labels` | Segmentation NIfTI path and optional reference | `LabelQCResult` | Check binary labels, NaN/Inf values, non-empty masks when required, and optional geometry alignment. |
-| Voxel evaluation | `pet_ai.evaluation.segmentation` | Prediction/ground-truth arrays or NIfTI paths | `SegmentationMetrics` | Count TP/FP/FN and compute Dice, FPV_mL, and FNV_mL. |
-| Lesion evaluation | `pet_ai.evaluation.lesion_metrics` | Prediction/ground-truth arrays | `LesionEvaluation` | Label connected components, match lesions, count TP/FP/FN lesions, and report small missed lesions and ambiguity. |
-| Provenance | `pet_ai.reproducibility` | File paths, command, seed, status | SHA256 strings and `RunManifest` | Record hashes and run metadata for reproducibility. |
-| Failure analysis | `docs/FAILURE_ANALYSIS.md` | Evidence-supported records | Documented categories | Separate software, environment, resource, and scientific/model failures. |
+## Data validation is not a PyTorch Dataset
 
-## Why the modules are separated
+[`pet_ai.data.manifest`](../src/pet_ai/data/manifest.py) validates tabular
+metadata, while [`pet_ai.data.split_validation`](../src/pet_ai/data/split_validation.py)
+checks patient keys across train, validation, and test partitions. These
+modules do not load tensors or define model batches.
 
-Manifest and split validation operate on metadata, not images. Geometry and label QC operate on NIfTI files before evaluation. Voxel and lesion metrics answer different questions: voxel overlap measures spatial agreement, while lesion matching measures detection behavior. Provenance is kept independent so any script can record hashes and run context.
+[`SyntheticPETCTDataset`](../src/pet_ai/datasets/synthetic_petct.py) is a
+PyTorch `Dataset` that deterministically creates two-channel PET/CT-like tensors
+and binary labels for software tests. Its samples are synthetic fixtures, not a
+clinical dataset or a bridge to the protected development cohort.
 
-This separation makes each behavior independently testable with synthetic data and reduces the risk of hidden exclusions or silent repairs.
+## Shared module responsibilities
+
+| Concern | Implementation | Contract |
+| --- | --- | --- |
+| Geometry and labels | [`pet_ai.qc`](../src/pet_ai/qc) | Validate explicit spatial units, coded transforms, common grids, finite binary labels, and configured empty-mask policy; do not silently repair data. |
+| Evaluation and quantification | [`pet_ai.evaluation`](../src/pet_ai/evaluation), [`pet_ai.quantification`](../src/pet_ai/quantification) | Report voxel/lesion behavior and physical quantities under explicit unit and empty-reference rules. |
+| Reliability | [`pet_ai.reliability`](../src/pet_ai/reliability) | Compute synthetic disagreement and risk–coverage quantities without claiming patient-level validation. |
+| Provenance | [`pet_ai.reproducibility`](../src/pet_ai/reproducibility) | Record hashes and run metadata; distinguish a declared seed from verified effective runtime control. |
+
+## Repository layers
+
+- [`scripts/`](../scripts) contains command-line and PowerShell entry points.
+  They coordinate modules or upstream commands; they are not the primary home
+  of reusable implementation logic.
+- [`src/pet_ai/`](../src/pet_ai) contains the reusable Python implementation,
+  including the synthetic PyTorch path and the public nnU-Net adaptation.
+- [`tests/`](../tests) checks observable behavior with synthetic fixtures,
+  analytic arrays, static recipe checks, and mocked wrapper executables. Tests
+  do not reproduce the protected five-case run.
+- [`docs/DEVELOPMENT_BASELINE_40E_CASE.md`](DEVELOPMENT_BASELINE_40E_CASE.md)
+  records the development case; the public method boundary is documented in
+  the [`PARTIAL_RECIPE`](../configs/development_baseline_40e/README.md).
+
+This separation keeps data checks, tensor loading, model execution, evaluation,
+and provenance independently inspectable without moving or duplicating code.

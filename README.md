@@ -1,212 +1,100 @@
-
 # PET/CT Segmentation, Quantification, and Reliability Engineering
 
-![CI](https://github.com/ddd08-right/PET-AI-Engineering/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/ddd08-right/PET-AI-Engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/ddd08-right/PET-AI-Engineering/actions/workflows/ci.yml)
 
-Three evidence tracks are intentionally separate:
+This repository asks a focused engineering question: **can segmentation overlap
+and net volume error give different rankings to the same predictions?** It
+connects public-safe PET/CT segmentation software to physical quantification,
+selective-review methods, and explicit evidence boundaries. It is not a
+clinical validation study.
 
-| Track | Evidence | Boundary |
-| --- | --- | --- |
-| Native PyTorch teaching baseline | Synthetic tensors and CPU tests | Engineering education; no patient performance. |
-| nnU-Net development case | One seed, fold 0, five development-validation cases | Real protected predictions; not independent testing or clinical validation. |
-| Reliability utilities | Synthetic mathematical and engineering checks | A real-patient reliability study and AURC analysis are not complete. |
+Overlap and net volume error answer different questions. Dice measures spatial
+agreement, whereas net volume error compares total predicted and reference
+volume. False-positive and false-negative volume can cancel in the latter even
+when the predicted foreground is poorly located. The repository therefore
+treats metric choice, applicability counts, physical units, and empty-reference
+behavior as part of the engineering contract rather than presentation details.
 
-![Evidence overview showing three separate tracks: a synthetic native PyTorch baseline, a five-case single-seed/fold nnU-Net development case, and synthetic reliability validation. Independent testing, external validation, and a real-patient reliability study are incomplete.](docs/figures/evidence_overview.svg)
+![Evidence overview showing separate synthetic PyTorch, nnU-Net development-case, and synthetic reliability tracks. Independent testing, external validation, and a real-patient reliability study remain incomplete.](docs/figures/evidence_overview.svg)
 
-*Figure 1. Repository evidence overview. Arrows show computations within each track; engineering PASS labels do not imply clinical validity. [PNG preview](docs/figures/evidence_overview.png).*
+*Three separate evidence tracks, not one completed patient-level pipeline. The
+native PyTorch and reliability tracks use synthetic inputs; the nnU-Net track is
+a five-case, development-exposed case study. [PNG preview](docs/figures/evidence_overview.png).*
 
-## Why this repository exists
+The tracks serve different purposes: the PyTorch path makes the mechanics of a
+training update inspectable, the development case preserves a bounded real-run
+observation, and the reliability path tests ranking mathematics. Shared QC and
+provenance utilities connect the software, but do not merge these evidence
+levels or convert synthetic checks into patient evidence.
 
-This engineering / methodology repository explores how PET/CT segmentation
-outputs can connect to physical quantitative endpoints and patient-level
-reliability evaluation, rather than treating segmentation overlap as the only
-endpoint. It is not a clinical validation study.
+## Implementation highlights
 
-## Core technical evidence
+| Capability | Implementation | Behavioral check | Evidence scope |
+| --- | --- | --- | --- |
+| Native PyTorch forward, BCE/soft-Dice loss, backward gradients, and optimizer update | [`unet3d.py`](src/pet_ai/models/unet3d.py), [`segmentation.py`](src/pet_ai/losses/segmentation.py), [`engine.py`](src/pet_ai/training/engine.py) | [`test_unet3d.py`](tests/test_unet3d.py), [`test_pytorch_loss.py`](tests/test_pytorch_loss.py), [`test_pytorch_training.py`](tests/test_pytorch_training.py) | Synthetic engineering demonstration; the compact U-Net pattern and PyTorch are not claimed as original research. |
+| PET/CT geometry QC and affine-determinant mask volume | [`geometry.py`](src/pet_ai/qc/geometry.py), [`volume.py`](src/pet_ai/quantification/volume.py) | [`test_geometry.py`](tests/test_geometry.py), [`test_quantification.py`](tests/test_quantification.py) | Synthetic NIfTI and NumPy checks; same-grid status does not prove anatomical registration. |
+| Binary segmentation and physical error quantities | [`segmentation.py`](src/pet_ai/evaluation/segmentation.py), [`volume.py`](src/pet_ai/quantification/volume.py) | [`test_segmentation_metrics.py`](tests/test_segmentation_metrics.py), [`test_quantification.py`](tests/test_quantification.py) | TP/FP/FN, Dice, FPV/FNV and generic mask volume under explicit empty-reference and unit policies. |
+| Risk–coverage curves, AURC, and order-invariant expected handling of score ties | [`risk_coverage.py`](src/pet_ai/reliability/risk_coverage.py) | [`test_risk_coverage.py`](tests/test_risk_coverage.py) | Synthetic arrays only; no completed patient-level reliability study. |
 
-- Native PyTorch 3D segmentation: dataset -> 3D U-Net -> loss -> backward pass -> optimizer update.
-- Patient-level split checks and PET/CT geometry and segmentation-label QC.
-- Physical binary-mask volume from a millimetre affine determinant; the legacy spacing-only API is explicitly limited to orthogonal voxel axes.
-- Patient-level quantitative-error and reliability utilities with explicit edge-case policies.
-- Risk--coverage evaluation with fixed-seed random, non-deployable best-case reference, and reverse controls.
-- Automated tests, CI workflows, a public-repository guardrail, provenance utilities, and synthetic demos.
+## Development case
 
-This repository is intentionally modest: it demonstrates public-safe software engineering patterns for PET/CT AI work using synthetic tests and explicit evidence labels. It does not claim that AutoPET, nnU-Net, Blackbean, or TCIA_processing were created here.
+The traceable case is a post-hoc, development-exposed comparison from one
+40-epoch run: seed `20260924`, fold `0`, and five development-validation cases.
+The checkpoint chosen by upstream online EMA pseudo Dice had higher strict Dice
+than the final checkpoint (`0.2187` versus `0.0991`, each over `n=3` non-empty
+references), while the final checkpoint had lower mean absolute volume error
+(`59.43 mL` versus `63.21 mL`, each over `n=5`). Thus overlap and net-volume
+endpoints ranked the checkpoints differently. An analytic all-empty prediction
+control had `33.30 mL` mean absolute volume error (`n=5`) but Dice `0.0000`
+(`n=3`); it is a calculation, not model inference, and its lower error does not
+indicate usable foreground segmentation. These observations do not isolate a
+causal effect of training duration.
 
-## 1. What this repository demonstrates
+Only public-safe aggregates and applicability counts are available here. The
+protected predictions and per-case values needed to recompute those aggregates
+are not published, so the comparison is traceable but not independently
+reproducible from this repository alone.
 
-- Python modules for manifest validation, patient-level split checks, PET/CT spatial QC, segmentation label QC, voxel metrics, lesion metrics, hashing, and run manifests.
-- Command-line scripts that call those modules rather than duplicating logic.
-- Synthetic tests and a one-command synthetic demo that can run without patient data, GPU access, nnU-Net weights, or external downloads.
-- Documentation that separates completed engineering work from planned research.
+See the [case report](docs/DEVELOPMENT_BASELINE_40E_CASE.md),
+[metric figure](docs/figures/development_metric_tradeoff.svg),
+[partial method recipe](configs/development_baseline_40e/README.md), and
+[frozen aggregate record](docs/development_baseline_40e_summary.json).
 
-## 2. Evidence status
+## Quick start
 
-| Area | Status | Boundary |
-| --- | --- | --- |
-| Manifest validation | ENGINEERING_SMOKE | Synthetic CSV tests and demo manifest. |
-| Patient-level split validation | ENGINEERING_SMOKE | Synthetic patient keys only. |
-| PET/CT geometry QC | ENGINEERING_SMOKE | Synthetic NIfTI images only. |
-| Segmentation label QC | ENGINEERING_SMOKE | Synthetic NIfTI masks only. |
-| Voxel-level metrics | ENGINEERING_SMOKE | Analytic arrays and synthetic masks. |
-| Lesion-level metrics | ENGINEERING_SMOKE | Connected-component tests with synthetic masks. |
-| Run provenance helpers | ENGINEERING_SMOKE | Synthetic file hashes and JSON manifests. |
-| Physical mask and generic uptake quantification | ENGINEERING_SMOKE | NumPy invariant tests and synthetic methodology demo. |
-| Patient-level reliability and risk--coverage | ENGINEERING_SMOKE | Deterministic NumPy tests, controls, and synthetic methodology demo. |
-| nnU-Net orchestration wrappers | DEVELOPMENT_EXPOSED | Parameterized wrappers; not run by CI. |
-| 40-epoch development baseline | DEVELOPMENT_EXPOSED | Single seed, fold 0, five development-validation cases; final and online-EMA-selected checkpoints evaluated. Not an independent test. |
-| WinError 1455 and low-VRAM notes | HISTORICAL_PROJECT_RECORD | Historical local records only; not rerun here. |
-| Clinical validation | PLANNED | No clinical validation is claimed. |
-
-## 3. Architecture / pipeline
-
-The modules can support manifest -> QC -> evaluation workflows, but the three
-evidence tracks above were not executed as one patient-level end-to-end study.
-
-Each stage has a small module under `src/pet_ai/` and a corresponding test or demo call. The scripts in `scripts/` are thin command-line entry points.
-
-## 4. Quick Start
+Python 3.10 or newer is required. Install the core package and test tools, then
+run the CPU synthetic pipeline:
 
 ```powershell
 python -m pip install -e ".[test]"
-python -m pytest -q -m "not pytorch"
-python -m ruff check .
-python scripts/verify_public_repo.py
-```
-
-## 5. One-command synthetic demo
-
-```powershell
 python scripts/demo_pipeline.py
 ```
 
-The demo creates temporary synthetic PET, CT, ground-truth mask, and prediction mask files; validates a public-safe manifest; checks splits, geometry, labels, voxel metrics, lesion metrics, and run provenance; then removes temporary imaging files automatically.
+The demo creates temporary synthetic PET, CT, reference-mask, prediction-mask,
+and manifest files; exercises manifest and split validation, geometry and label
+QC, voxel and lesion metrics, and provenance; then removes the temporary image
+files. Its output is engineering status for synthetic fixtures, not patient
+performance. The optional [native PyTorch CPU demo](scripts/demo_pytorch_train.py)
+requires the separately declared `pytorch` extra. The nnU-Net development
+method is a [`PARTIAL_RECIPE`](configs/development_baseline_40e/README.md), not
+an independent one-command reproduction of the historical run.
 
-## Native PyTorch 3D Baseline
+## Scope and further reading
 
-The repository includes a small native PyTorch 3D segmentation baseline for engineering education:
+Public executable tests and demos use synthetic data. The only real-prediction
+evidence published here is the de-identified aggregate record for five
+development-validation cases from a single seed and fold; validation results
+were repeatedly inspected during engineering. There is no independent test or
+external validation, and a real-patient reliability study is incomplete. The
+public method omits protected data, weights, split membership, private
+orchestration, and parts of the historical recovery context, so it cannot
+independently reproduce the private result. Recorded hashes support provenance,
+not clinical validity. AutoPET, nnU-Net, Blackbean, and TCIA_processing remain
+upstream or third-party work.
 
-- native `torch.utils.data.Dataset` with synthetic PET/CT tensors
-- small 3D U-Net using `Conv3d`, pooling, transposed convolution, and skip connections
-- BCE-with-logits plus soft Dice segmentation loss
-- explicit training loop with `loss.backward()` and `optimizer.step()`
-- unit tests for backward gradients and optimizer parameter updates
-- CPU synthetic demonstration in `scripts/demo_pytorch_train.py`
-
-Evidence boundary: this is a synthetic engineering demonstration only. It is not a clinical model, not a performance benchmark, and makes no clinical performance claims.
-
-Install the pinned public PyTorch dependency and test tools, then run the CPU demo:
-
-```powershell
-python -m pip install -e ".[test,pytorch]"
-python scripts/demo_pytorch_train.py --device cpu
-```
-
-## 6. Data and patient-level split validation
-
-`pet_ai.data.manifest` validates required public-safe fields and rejects obvious patient/private fields. `pet_ai.data.split_validation` checks that the same `patient_key` does not appear across train, validation, and test splits.
-
-Development-exposed data must not be described as an independent test set.
-
-## 7. PET/CT spatial and label QC
-
-`pet_ai.qc.geometry` compares NIfTI shape, voxel spacing, orientation, and affine. `pet_ai.qc.labels` checks binary segmentation labels, NaN/Inf values, optional non-empty masks, and optional geometry alignment to a reference image.
-
-The QC modules report problems. They do not silently resample, repair, or exclude cases.
-NIfTI geometry requires an explicit recognized spatial unit and is normalized
-to millimetres for comparison. Same-grid status allows index-wise comparison;
-it does not prove anatomical registration. Project policy also requires at
-least one coded qform or sform. A fallback affine with both codes zero is not
-accepted as a verified physical-space source; two valid but conflicting coded
-forms are rejected, while one valid form is sufficient.
-
-## 8. Voxel-level segmentation evaluation
-
-`pet_ai.evaluation.segmentation` reports TP, FP, FN, Dice, FPV_mL, and FNV_mL.
-The standard formula gives Dice 0 for empty reference/non-empty prediction and
-0/0 only when both are empty. This project's strict aggregation policy excludes
-all empty-reference cases, retaining the historical `NaN`/`null` and
-`UNDEFINED_EMPTY_GT` API label. It is therefore a non-empty-reference Dice,
-not a claim that every empty-reference Dice is mathematically undefined.
-Negative cases should be reviewed using false-positive volume.
-Inputs must be finite, strictly binary, same-shaped 3D arrays. The NIfTI entry
-point additionally rejects physical-grid mismatch before computing metrics.
-
-## 9. Lesion-level evaluation
-
-`pet_ai.evaluation.lesion_metrics` identifies 3D connected components in ground truth and prediction, measures lesion volumes in mL, and performs deterministic one-to-one overlap matching. Split/merge ambiguity is reported explicitly because overlap alone cannot determine biological lesion identity in those cases.
-
-## 10. Reproducibility
-
-`pet_ai.reproducibility.hashing` computes SHA256 file hashes.
-`pet_ai.reproducibility.run_manifest` distinguishes a declared/requested seed
-from an effective seed and its verification status. A declaration from the
-PowerShell wrapper is not evidence that trainer RNG state was controlled.
-
-## 11. Debugging / failure analysis
-
-`docs/FAILURE_ANALYSIS.md` documents evidence-supported historical failures and separates software bugs, environment failures, resource failures, and scientific/model failures.
-
-## 12. nnU-Net orchestration
-
-`scripts/train_nnunet.ps1` and `scripts/infer_nnunet.ps1` are wrappers around upstream nnU-Net commands. They require explicit parameters and environment variables. CI does not train, infer, download weights, or require a GPU.
-
-The completed 40-epoch, single-seed, fold-0 development case is documented in
-[`docs/DEVELOPMENT_BASELINE_40E_CASE.md`](docs/DEVELOPMENT_BASELINE_40E_CASE.md),
-with its public-safe aggregate record in
-[`docs/development_baseline_40e_summary.json`](docs/development_baseline_40e_summary.json).
-It includes real predictions and evaluation for the final checkpoint and the
-checkpoint selected by the online EMA pseudo-Dice rule across five development
-validation cases. The protected predictions and per-case evidence are not
-published in this repository.
-
-The public-safe method extraction and command/output contract are documented in
-[`configs/development_baseline_40e/README.md`](configs/development_baseline_40e/README.md).
-It is a `PARTIAL_RECIPE`: nnU-Net/PyTorch remain external historical
-dependencies, protected data and weights are absent, and this repository did
-not rerun training or inference.
-
-The sampler diagram distinguishes case-slot assignment from upstream spatial
-patch selection: [midpoint sampling method](docs/figures/midpoint_sampling.svg)
-([PNG preview](docs/figures/midpoint_sampling.png)). The `0.82` value is a
-slot-1 foreground-forcing probability, not a positive-case sampling rate.
-
-Generate the self-contained SVG figures with Python only (no browser required):
-
-```bash
-python scripts/render_public_figures.py
-```
-
-PNG previews are optional. To regenerate them, explicitly supply a local
-Edge/Chromium executable; a browser launch or render failure returns an error:
-
-```powershell
-python scripts/render_public_figures.py --edge /path/to/chromium
-```
-
-## 13. Research extensions - PLANNED ONLY
-
-The following remain PLANNED unless future evidence is added: multi-center OOD, multi-tracer OOD, FDG -> PSMA transfer, validated SUV error, and study-defined tumor-volume biomarkers. The v0.3 reliability utilities are synthetic engineering evidence, not clinical evidence.
-
-## 14. Evidence boundaries
-
-Public executable tests and demos use synthetic data only. The public code and
-synthetic examples can be run without protected data, but the private real-case
-metrics cannot be independently recomputed from the public aggregates alone.
-This repository does not contain patient images, PHI, patient mappings,
-per-case real-data results, raw clinical spreadsheets, DICOM metadata dumps,
-model weights, checkpoints, protected predictions, private logs, or secrets.
-
-One traceable real-data development case is complete: a 40-epoch, single-seed,
-fold-0 run with five development validation cases, including final and
-online-EMA-selected-checkpoint predictions and evaluation. The public repository
-contains only the de-identified aggregate results, method and provenance
-summary, and limitations. Recorded source hashes support artifact identity and
-traceability; they are not independent scientific validation. Complete OOF
-coverage, an independent test set, external validation, and a reliability study
-remain incomplete. Neither clinical effectiveness nor completion of the wider
-research programme is claimed.
-
-## 15. Third-party attribution
-
-AutoPET, nnU-Net, Blackbean, and TCIA_processing are upstream or third-party work. See `THIRD_PARTY.md` for attribution boundaries.
+Further reading: [architecture](docs/ARCHITECTURE.md),
+[implementation-to-test evidence](docs/PROGRAMMING_EVIDENCE.md),
+[development case](docs/DEVELOPMENT_BASELINE_40E_CASE.md),
+[partial recipe](configs/development_baseline_40e/README.md),
+[data provenance](docs/DATA_PROVENANCE.md), and
+[third-party attribution](THIRD_PARTY.md).
