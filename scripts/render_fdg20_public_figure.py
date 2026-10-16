@@ -9,7 +9,6 @@ from html import escape
 from pathlib import Path
 from typing import Any
 
-
 METHODS = (
     "Entropy",
     "Fold variance",
