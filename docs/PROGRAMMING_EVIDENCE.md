@@ -13,7 +13,8 @@ synthetic fixtures or analytic arrays and do not establish clinical validity.
 | Affine-aware physical volume | [`quantification/volume.py`](../src/pet_ai/quantification/volume.py) | [`test_quantification.py`](../tests/test_quantification.py), [`test_real_data_audit.py`](../tests/test_real_data_audit.py) | Uses the absolute determinant of a validated millimetre affine; covers orthogonal, sheared, and reflected synthetic grids. |
 | Segmentation counts and physical error volumes | [`evaluation/segmentation.py`](../src/pet_ai/evaluation/segmentation.py) | [`test_segmentation_metrics.py`](../tests/test_segmentation_metrics.py) | Validates binary 3D inputs and common geometry; reports TP/FP/FN, Dice, FPV, and FNV. |
 | Lesion matching and ambiguity reporting | [`evaluation/lesion_metrics.py`](../src/pet_ai/evaluation/lesion_metrics.py) | [`test_lesion_metrics.py`](../tests/test_lesion_metrics.py) | Deterministic connected-component overlap matching; split/merge ambiguity is surfaced rather than interpreted biologically. |
-| Risk–coverage and score ties | [`reliability/risk_coverage.py`](../src/pet_ai/reliability/risk_coverage.py) | [`test_risk_coverage.py`](../tests/test_risk_coverage.py) | Default tie handling computes the expected risk across within-tie permutations; input-order-dependent `stable` behavior is an explicit legacy option. |
+| Risk–coverage and score ties | [`reliability/risk_coverage.py`](../src/pet_ai/reliability/risk_coverage.py) | [`test_risk_coverage.py`](../tests/test_risk_coverage.py) | Default tie handling computes the expected risk across within-tie permutations; input-order-dependent `stable` behavior is an explicit legacy option. Tests are synthetic, not patient validation. |
+| Public FDG20 aggregate display | [`render_fdg20_public_figure.py`](../scripts/render_fdg20_public_figure.py) | [`test_fdg20_public_artifacts.py`](../tests/test_fdg20_public_artifacts.py) | Parses aggregate-only JSON and renders an SVG summary; cannot recompute protected per-case results. |
 | Run provenance and seed semantics | [`reproducibility/run_manifest.py`](../src/pet_ai/reproducibility/run_manifest.py), [`train_nnunet.ps1`](../scripts/train_nnunet.ps1) | [`test_run_manifest.py`](../tests/test_run_manifest.py), [`test_train_nnunet_wrapper.py`](../tests/test_train_nnunet_wrapper.py) | Records declared seed metadata separately from evidence of effective runtime control; wrapper tests use mocks, not training. |
 | Public development sampler/trainer adaptation | [`development_baseline_40e.py`](../src/pet_ai/nnunet_extensions/development_baseline_40e.py) | [`test_public_method_recipe.py`](../tests/test_public_method_recipe.py) | Static checks cover a post-hoc `PARTIAL_RECIPE`; the protected run is not reproduced. |
 
@@ -28,6 +29,16 @@ therefore excludes all empty-reference cases from Dice and averages the three
 non-empty references. This API policy is not presented as a universal
 mathematical definition. FPV, FNV, and absolute volume error retain all five
 development cases.
+
+## FDG20 evidence boundary
+
+The FDG20 five-fold/TTA run, member predictions, reference evaluation, and
+patient-level scoring were performed in a protected environment and are not
+implemented as a public end-to-end runner here. The public renderer consumes
+only the aggregate JSON; its tests validate schema and display behavior, not
+model inference, patient data, or clinical reliability. The frozen entropy and
+fold-variance results are distinguished from post-hoc Predicted MTV and
+Pairwise comparisons in [`FDG20_PILOT_METHODS.md`](FDG20_PILOT_METHODS.md).
 
 ## Contribution and dependency boundary
 
