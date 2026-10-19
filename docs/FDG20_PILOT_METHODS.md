@@ -1,6 +1,6 @@
 # FDG20 fixed-prediction development pilot
 
-**Status: completed development-exposed engineering and analysis; not independent validation.** This is a private publication candidate. Public release of these aggregate results remains pending data/IP-owner approval.
+**Status: completed development-exposed engineering and analysis; not independent validation.** Aggregate development-pilot results and methods are publicly released. The study remains development-exposed and is not independent clinical validation. Release through [PR #6](https://github.com/ddd08-right/PET-AI-Engineering/pull/6) was merged on 2026-10-19 at 07:24:48 UTC ([merge commit](https://github.com/ddd08-right/PET-AI-Engineering/commit/45aaf382a55220d07d05e533d9a06b0bc1bd7eb4)). Public release does not approve the future SAP or clinical-reference SOP, establish clinical benefit or PSMA transfer, or grant model-weight redistribution rights.
 
 ## Research question and completed analysis
 
@@ -21,6 +21,14 @@ The analytic random-order expected AURC is 28.626166246512675 mL. The reference-
 
 The analytic random reference is the expected AURC under a uniformly random case order, equal to cohort mean R. The oracle sorts by observed reference-derived risk and is reference-informed. Neither changes the patient selection or evaluation set.
 
+## Metric-level analysis provenance
+
+Entropy and fold variance AURC and retained risk at 80% coverage are `FROZEN_ANALYSIS` under the existing frozen contract. Predicted MTV and Pairwise comparisons are `POST_HOC`. The FNV share in four referrals is `POST_HOC` for **all four methods**, including Entropy and fold variance. JSON row-level `analysis_status` is retained for compatibility and describes AURC/retained risk only; `metric_analysis_status` labels each metric explicitly. This is development evidence, not confirmatory clinical research.
+
+## Figure provenance and display
+
+The [released PNG](figures/fdg20_pilot_aggregate.png) is the source-bound historical figure. Its same-content historical visual QA is reused; no image was redrawn for this revision. The current renderer reads public aggregate JSON and generates SVG only; it did not generate the historical PNG and does not byte-reproduce it. SVG structural checks are not rendered visual QA; an unreviewed SVG is not added to the released figure set. A browser viewport check for this revision is NOT_OBSERVED. README display values use decimal round-half-up (AURC/risk: two decimals; FNV percentage: one decimal); JSON retains original numeric precision.
+
 ## Limits and next evidence gates
 
 This is not OOF, an untouched test set, clinical utility, an estimate of lesion sensitivity, or PSMA/external-centre validation. Five folds are not independent seeds. Full-grid scores can be affected by background and field-of-view. Input QC is not blinded evaluation of prediction quality, and error volume is not clinical severity. Reference completeness, lesion matching, and clinically major-FN definitions have not been clinically validated. Historical adaptation-code byte identity remains incomplete; model/checkpoint redistribution rights are not established.
@@ -32,4 +40,4 @@ was assessed.
 
 Future work is proposed, not run: (1) audit patient/examination exposure and model selection; (2) obtain PI/statistician approval and validate fixed scores on independent FDG data; (3) resolve complete lesion references and clinical safety definitions; (4) only if a blind spot is clinically confirmed, seek separate approval for complementary evidence while keeping the primary mask fixed and measuring false prompts, remaining FN, and actual reader time; (5) treat PSMA and external-centre transfer as separately designed studies. Sample size, centre count, budget, thresholds, and major-FN definition remain TBD. The SAP and clinical-reference SOP remain approval candidates.
 
-Full discrete curves, per-case ranks, identifiers, images, masks, probabilities, private paths, and weights are excluded. Aggregate values and figures still require data/IP-owner release review. This page is not authorized for publication.
+Full discrete curves, per-case ranks, identifiers, images, masks, probabilities, private paths, and weights are excluded. The released scope is aggregate results, methods, code and figures; patient-level artifacts and model weights remain excluded. Future data access and expanded disclosure require their own permissions.
