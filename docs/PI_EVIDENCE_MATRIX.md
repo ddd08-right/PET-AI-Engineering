@@ -24,19 +24,6 @@ This matrix indexes the public evidence at baseline `f4eb944cb6447c32feedf506599
 | R02 | Clinical missed-lesion/complementary-evidence research is conditional | [design candidate](RESEARCH_DESIGN_CANDIDATE.md); [G6–G8](RESEARCH_GATES.md#study-2--clinical-missed-lesion-and-failure-analysis) | `PROPOSED / NOT RUN` | Clinical SOP `PENDING` | Confirm blind spot before supplemental model; actual false-prompt/review cost required |
 | R03 | Reader, independent PSMA and cross-centre studies remain future work | [design candidate](RESEARCH_DESIGN_CANDIDATE.md); [G8–G10](RESEARCH_GATES.md) | `PROPOSED / NOT RUN` | No independent transfer or reader outcome | Tracer, centres, sample size, expected effects and approvals `TBD / PENDING` |
 
-## Local/public evidence reconciliation
+## Public evidence boundary
 
-Read-only comparison during this documentation task found the following differences between the existing dirty checkout and the verified public baseline. Original working files are preserved; none is copied into this branch. Classifications are content-based, not filename-based. They describe version differences, not a decision that one scientific result is superior.
-
-| Material | Classification | Treatment |
-|---|---|---|
-| README and current research-design candidate | `CONTENT_CONFLICT` | Different development narratives; new navigation is based on public main only |
-| FDG20 aggregate JSON | `CONTENT_CONFLICT` | Local v1 schema versus public v2 schema; overlapping frozen endpoints agree at README display precision, but differ in encoding/last digits; public v2 additionally labels post-hoc comparisons and metric provenance. Exact source equivalence beyond public display remains `NOT_VERIFIED`; neither file rewritten |
-| FDG20 released PNG | `CONTENT_CONFLICT` | Bytes differ; local/public figure equivalence `NOT_VERIFIED`; public released figure retained unchanged |
-| FDG20 pilot case, remediation report, alternate SVG, local renderer and publication test | `LOCAL_ONLY_UNCOMMITTED` | Not present at the same paths in public main; retained locally for separate reconciliation; no automatic copying or publication |
-| Data provenance, architecture, programming evidence and third-party attribution | `CONTENT_CONFLICT` | Public main adds FDG20 scope/boundaries and LesionTracer attribution; retained from public baseline without rewriting historical evidence |
-| Five-case methods and aggregate JSON | `IDENTICAL` content after CRLF/LF normalization | Byte hashes differ only through line endings; normalized text comparison shows no scientific difference |
-| AGENTS.md and CI workflow | `IDENTICAL` | Byte hashes match |
-| FDG20 methods at the required public path | `REMOTE_ALREADY_CONTAINS` | Public main contains the methods; that path is absent in the older local checkout |
-
-No dirty artifact was classified `REMOTE_ALREADY_CONTAINS`. Unresolved local-only provenance is a separate reconciliation item, not new verified evidence. The existing stale five-case preparation-status conflict is also preserved in `development_baseline_40e_summary.json.preserved_source_conflict`; it is not used as completion evidence.
+Protected historical development materials have separate identity and version-reconciliation records. Those materials and unresolved version differences are not new public scientific evidence; public claims rely on the corresponding inspectable sources above. Patient-level data, predictions and model weights remain excluded. The preserved five-case preparation-status conflict is documented in its source JSON and is not completion evidence.

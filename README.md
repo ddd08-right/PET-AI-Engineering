@@ -52,7 +52,16 @@ The five-case experiment is not pooled with FDG20. Its checkpoint rankings diffe
 
 Values are decimal round-half-up from the linked JSON, to two decimals. Frozen labels apply only to AURC and retained risk. Lower AURC is better: analytic random-order expectation is 28.63 mL; reference-informed oracle is 5.80 mL and is not deployable. **Pairwise disagreement performed worse than the random-order expectation.** Predicted MTV's proximity to the oracle is descriptive for this cohort, not a general advantage or a UQ result.
 
-At a simulated 20% review budget (4 referred, 16 retained), referral-FNV shares were 49.2% (Entropy), 23.7% (variance), 65.5% (Predicted MTV), and 0.0% (Pairwise). **All four shares are post-hoc.** They measure error allocation, not corrected errors, lesion sensitivity, reduced missed disease, saved reader time, or improved clinical safety. Computational common-uncovered regions are candidates, not clinically confirmed complete lesion misses. No clinically major false-negative endpoint was assessed. Exact values and metric-level labels remain in the [unchanged source JSON](docs/fdg20_pilot_aggregate_summary.json).
+At a simulated 20% review budget (4 referred, 16 retained), the share of cohort FNV assigned to referrals was:
+
+| Score | Referral-FNV share | Analysis status |
+|---|---:|---|
+| Entropy | 49.2% | Post-hoc |
+| Fold probability variance | 23.7% | Post-hoc |
+| Predicted MTV | 65.5% | Post-hoc |
+| Pairwise disagreement | 0.0% | Post-hoc |
+
+**All four shares are post-hoc.** They measure error allocation, not corrected errors, lesion sensitivity, reduced missed disease, saved reader time, or improved clinical safety. Computational common-uncovered regions are candidates, not clinically confirmed complete lesion misses. No clinically major false-negative endpoint was assessed. Exact values and metric-level labels remain in the [unchanged source JSON](docs/fdg20_pilot_aggregate_summary.json).
 
 ## Programming Contributions and Upstream Attribution
 
@@ -85,4 +94,4 @@ python scripts/render_fdg20_public_figure.py --input docs/fdg20_pilot_aggregate_
 
 With an existing compatible CPU PyTorch environment, also run `python -m pytest -q -m pytorch`. The SVG command displays public aggregates; it does not byte-reproduce the historical PNG. Synthetic tests and display checks cannot recompute protected patient-level FDG20 or five-case results, validate clinical references, or establish clinical benefit. Rendered visual QA is separate from structural checks.
 
-Patient images, masks, member probabilities, case mappings, private orchestration and weights are excluded. Full reproduction needs separately governed data, historical execution code and permitted model artifacts. Hashes establish traceability, not clinical validity. See [data provenance](docs/DATA_PROVENANCE.md), [metric definitions](docs/METRICS.md), and the [evidence matrix](docs/PI_EVIDENCE_MATRIX.md) for exact boundaries and unresolved local/public differences.
+Patient images, masks, member probabilities, case mappings, private orchestration and weights are excluded. Full reproduction needs separately governed data, historical execution code and permitted model artifacts. Hashes establish traceability, not clinical validity. See [data provenance](docs/DATA_PROVENANCE.md), [metric definitions](docs/METRICS.md), and the [evidence matrix](docs/PI_EVIDENCE_MATRIX.md) for exact sources and public reproducibility boundaries.
