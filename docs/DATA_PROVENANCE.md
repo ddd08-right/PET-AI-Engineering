@@ -1,7 +1,7 @@
 
 # Data Provenance
 
-Public executable artifacts contain schemas and synthetic tests; the repository also documents one public-safe aggregate development case. It does not include DICOM, patient NIfTI files, clinical spreadsheets, segmentation masks from patients, model checkpoints, or raw private logs.
+Public executable artifacts contain schemas and synthetic tests; the repository documents a public-safe five-case development aggregate and an aggregate-only 20-case FDG development pilot. It does not include DICOM, patient NIfTI files, clinical spreadsheets, segmentation masks from patients, model checkpoints, member probabilities, or raw private logs.
 
 A public-safe manifest should use de-identified `case_id` and `patient_key` values. It should not contain names, dates of birth, accession numbers, medical record numbers, hospital numbers, addresses, phone numbers, local absolute paths, or raw DICOM metadata dumps.
 
@@ -79,3 +79,18 @@ records `continue_wrapper_result.json`, `manual_wrapper_result.json`, and
 `ema_selected_evaluation_result.json`. Their recorded digests are exposed in
 the aggregate JSON for identity and traceability, not as independent scientific
 validation.
+
+## Separate FDG20 fixed-prediction pilot
+
+The 20-case FDG cohort is an availability-sampled development pilot. It
+contains 10 reference-foreground and 10 empty-reference annotations; empty
+annotation is not clinical-negative status. Patient training exposure was not
+excluded. The formal run used five folds with TTA enabled and official
+logits-based integration. Per-case predictions, references, member
+probabilities, identifiers, and orchestration remain protected and are not
+included in this repository. The public JSON and PNG contain only aggregate
+summaries; they do not permit independent reconstruction of patient-level
+scores. The source-bound aggregate and methods record are linked from the
+[FDG20 methods page](FDG20_PILOT_METHODS.md). The SAP and clinical-reference SOP
+remain approval candidates, and no independent FDG or clinical validation is
+claimed.

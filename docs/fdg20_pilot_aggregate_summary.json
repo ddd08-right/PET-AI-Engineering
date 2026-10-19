@@ -1,0 +1,66 @@
+{
+    "schema":  "fdg20-pilot-aggregate-summary-v2",
+    "analysis_scope":  "POST_HOC_DEVELOPMENT_EXPLORATION; fixed predictions; aggregate only",
+    "release_state":  "PRIVATE_CANDIDATE; data/IP owner approval pending; not published",
+    "cohort":  {
+                   "empty_reference_annotations":  10,
+                   "training_exposure_excluded":  false,
+                   "independent_validation":  false,
+                   "n":  20,
+                   "sampling":  "availability-sampled",
+                   "reference_foreground_annotations":  10
+               },
+    "risk":  {
+                 "coverage_80":  "16 retained / 4 referred",
+                 "definition":  "R = FPV + FNV",
+                 "unit":  "mL",
+                 "lower_AURC_is_better":  true
+             },
+    "methods":  [
+                    {
+                        "cohort_FNV_share_in_4_referrals":  0.491799021941403,
+                        "name":  "Entropy",
+                        "mean_retained_R_at_80pct_coverage_mL":  15.253468764473348,
+                        "discrete_AURC_mL":  9.0222480915834655,
+                        "analysis_status":  "FROZEN_ANALYSIS"
+                    },
+                    {
+                        "cohort_FNV_share_in_4_referrals":  0.23681135586618773,
+                        "name":  "Fold variance",
+                        "mean_retained_R_at_80pct_coverage_mL":  21.512857231313863,
+                        "discrete_AURC_mL":  9.630056379120802,
+                        "analysis_status":  "FROZEN_ANALYSIS"
+                    },
+                    {
+                        "cohort_FNV_share_in_4_referrals":  0.6551694291773057,
+                        "name":  "Predicted MTV (size baseline; not UQ)",
+                        "mean_retained_R_at_80pct_coverage_mL":  10.098220871907802,
+                        "discrete_AURC_mL":  5.9740424771029508,
+                        "analysis_status":  "POST_HOC"
+                    },
+                    {
+                        "cohort_FNV_share_in_4_referrals":  0,
+                        "name":  "Pairwise disagreement",
+                        "mean_retained_R_at_80pct_coverage_mL":  35.701841174531971,
+                        "discrete_AURC_mL":  58.642476696090327,
+                        "analysis_status":  "POST_HOC"
+                    }
+                ],
+    "references":  {
+                       "oracle_AURC_mL":  5.7986986346595488,
+                       "oracle_definition":  "reference-informed ordering by observed R; not deployable",
+                       "random_definition":  "uniform random ordering; expected AURC equals cohort mean R",
+                       "random_analytic_expected_AURC_mL":  28.626166246512675
+                   },
+    "interpretation":  [
+                           "Predicted MTV is a fixed-mask size/burden baseline, not UQ.",
+                           "Pairwise disagreement had AURC above the analytic random expectation in this development cohort; retain this adverse observation.",
+                           "FNV share in referred cases is not observed clinical correction.",
+                           "No independent validation or demonstrated clinical benefit."
+                       ],
+    "source_summary":  {
+                           "analysis_version":  "frozen primary analysis plus separately labeled post-hoc aggregate derivation",
+                           "frozen_contract_SHA256":  "9656AD81DBFC32A535FA07EEFB1FC64B60B3011FE84BAAEDFBB56A63C4D7812A",
+                           "existing_reconciliation_SHA256":  "EF8761B62D256009BED9E75BB94B879133DCFA67A05338FA67B76A6ED11BE353"
+                       }
+}

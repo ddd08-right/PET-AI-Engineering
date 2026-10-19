@@ -40,3 +40,33 @@ accuracy and not a claim of equivalence to an AutoPET official implementation.
 The overlap matrix `[[9, 8], [8, 0]]` is a counterexample: greedy returns one
 match although a two-match assignment exists. Maximum-cardinality matching is
 not implemented. Split/merge ambiguity remains explicitly reported.
+
+## FDG20 fixed-prediction development analysis
+
+The FDG20 pilot uses a different, protected fixed-prediction pipeline and
+should not be conflated with the generic public functions above. The official
+five-fold, TTA-enabled path and official logits integration form the final
+binary mask. Member foreground-probability maps are used for reference-free
+scores; the reference does not enter prediction or scoring.
+
+- `R_spatial = FPV + FNV` (mL) is total spatial error volume. It is not the
+  absolute net MTV error.
+- `E_MTV = |FPV - FNV|` (mL) is the absolute net-volume difference on a common
+  binary physical grid. When the same mask, reference, and voxel volume are
+  used, it is algebraically equal to `abs(FPV - FNV)`.
+- FNV alone is the false-negative volume. It is not a lesion count, a complete
+  lesion-miss rate, or a clinical-severity measure.
+- Frozen entropy is calculated from the mean foreground probability and
+  aggregated over the full PET evaluation grid. Fold probability variance uses
+  the frozen population-variance implementation. Pairwise disagreement and
+  Predicted MTV are post-hoc comparisons; Predicted MTV is a size baseline, not
+  an uncertainty measure.
+
+Reported risk–coverage and AURC values are descriptive for a 20-case
+availability-sampled development cohort (10 reference-foreground and 10
+empty-reference annotations); training exposure was not excluded. Full-grid
+averages may be affected by background and field of view. A simulated referral
+share does not measure correction, clinical utility, or reader time. See
+[`FDG20_PILOT_METHODS.md`](FDG20_PILOT_METHODS.md) for the aggregate values,
+method status, and limits. No independent validation or lesion-level clinical
+adjudication is established by these quantities.
