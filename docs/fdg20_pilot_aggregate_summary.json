@@ -1,7 +1,7 @@
 {
     "schema":  "fdg20-pilot-aggregate-summary-v2",
-    "analysis_scope":  "POST_HOC_DEVELOPMENT_EXPLORATION; fixed predictions; aggregate only",
-    "release_state":  "PRIVATE_CANDIDATE; data/IP owner approval pending; not published",
+    "analysis_scope":  "FROZEN_DEVELOPMENT_ANALYSIS + SEPARATELY_LABELED_POST_HOC_EXPLORATION; fixed predictions; aggregate only; not confirmatory",
+    "release_state":  "PUBLIC_AGGREGATE_RELEASE; development-exposed; not independent clinical validation; no SAP, clinical-reference SOP or model-weight redistribution approval implied",
     "cohort":  {
                    "empty_reference_annotations":  10,
                    "training_exposure_excluded":  false,
@@ -22,28 +22,32 @@
                         "name":  "Entropy",
                         "mean_retained_R_at_80pct_coverage_mL":  15.253468764473348,
                         "discrete_AURC_mL":  9.0222480915834655,
-                        "analysis_status":  "FROZEN_ANALYSIS"
+                        "analysis_status":  "FROZEN_ANALYSIS",
+                        "metric_analysis_status": {"discrete_AURC_mL": "FROZEN_ANALYSIS", "mean_retained_R_at_80pct_coverage_mL": "FROZEN_ANALYSIS", "cohort_FNV_share_in_4_referrals": "POST_HOC"}
                     },
                     {
                         "cohort_FNV_share_in_4_referrals":  0.23681135586618773,
                         "name":  "Fold variance",
                         "mean_retained_R_at_80pct_coverage_mL":  21.512857231313863,
                         "discrete_AURC_mL":  9.630056379120802,
-                        "analysis_status":  "FROZEN_ANALYSIS"
+                        "analysis_status":  "FROZEN_ANALYSIS",
+                        "metric_analysis_status": {"discrete_AURC_mL": "FROZEN_ANALYSIS", "mean_retained_R_at_80pct_coverage_mL": "FROZEN_ANALYSIS", "cohort_FNV_share_in_4_referrals": "POST_HOC"}
                     },
                     {
                         "cohort_FNV_share_in_4_referrals":  0.6551694291773057,
                         "name":  "Predicted MTV (size baseline; not UQ)",
                         "mean_retained_R_at_80pct_coverage_mL":  10.098220871907802,
                         "discrete_AURC_mL":  5.9740424771029508,
-                        "analysis_status":  "POST_HOC"
+                        "analysis_status":  "POST_HOC",
+                        "metric_analysis_status": {"discrete_AURC_mL": "POST_HOC", "mean_retained_R_at_80pct_coverage_mL": "POST_HOC", "cohort_FNV_share_in_4_referrals": "POST_HOC"}
                     },
                     {
                         "cohort_FNV_share_in_4_referrals":  0,
                         "name":  "Pairwise disagreement",
                         "mean_retained_R_at_80pct_coverage_mL":  35.701841174531971,
                         "discrete_AURC_mL":  58.642476696090327,
-                        "analysis_status":  "POST_HOC"
+                        "analysis_status":  "POST_HOC",
+                        "metric_analysis_status": {"discrete_AURC_mL": "POST_HOC", "mean_retained_R_at_80pct_coverage_mL": "POST_HOC", "cohort_FNV_share_in_4_referrals": "POST_HOC"}
                     }
                 ],
     "references":  {

@@ -13,8 +13,7 @@ separate branches: official logits integration → fixed final mask → Predicte
 MTV size baseline; and member probabilities/masks → entropy, fold variance, and
 Pairwise disagreement. Scores order the same cases under a simulated review
 budget; the reference enters evaluation and post-hoc error analysis only, never
-prediction or reference-free scoring. Public workflow is described in text
-because the revised SVG has not had independent render QA.
+prediction or reference-free scoring.
 
 ## FDG20 development pilot
 
@@ -22,14 +21,16 @@ The same official five-fold, TTA-enabled path and official logits integration pr
 
 | Score | Analysis status | Discrete AURC (mL) | Mean retained risk at 80% coverage (mL) |
 |---|---|---:|---:|
-| Entropy | Frozen primary analysis | 9.022248091583466 | 15.253468764473348 |
-| Fold probability variance | Frozen primary analysis | 9.630056379120802 | 21.512857231313863 |
-| Predicted MTV | Post-hoc size baseline; not UQ | 5.9740424771029508 | 10.098220871907802 |
-| Pairwise disagreement | Post-hoc | 58.642476696090327 | 35.701841174531971 |
+| Entropy | Frozen primary analysis | 9.02 | 15.25 |
+| Fold probability variance | Frozen primary analysis | 9.63 | 21.51 |
+| Predicted MTV | Post-hoc size baseline; not UQ | 5.97 | 10.10 |
+| Pairwise disagreement | Post-hoc | 58.64 | 35.70 |
 
-Lower AURC is better. The analytic random-order expectation was 28.626166246512675 mL; the reference-informed oracle was 5.7986986346595488 mL and is not deployable. Pairwise disagreement's result above the random expectation is retained. Predicted MTV's proximity to the oracle is a descriptive result for this development cohort, not evidence that a size baseline is generally optimal.
+Display values use decimal round-half-up: two decimals for AURC/risk and one decimal for FNV percentages; the JSON retains original precision. Frozen labels in this table apply to AURC and retained risk only; all referral-FNV shares below are post-hoc.
 
-At a simulated 20% review budget (4 referred, 16 retained), the post-hoc share of cohort FNV assigned to the four referrals was 49.18% for entropy, 23.68% for variance, 65.52% for Predicted MTV, and 0% for Pairwise disagreement. This allocation is not observed clinical correction, lesion sensitivity, or reduced missed disease. Computational common-uncovered regions are candidate mechanisms only; without clinically validated reference completeness and matching, they are not complete lesion misses. No clinically major false-negative endpoint was assessed. See [methods and evidence boundaries](docs/FDG20_PILOT_METHODS.md) and the source-bound [aggregate figure](docs/figures/fdg20_pilot_aggregate.png).
+Lower AURC is better. The analytic random-order expectation was 28.63 mL; the reference-informed oracle was 5.80 mL and is not deployable. Pairwise disagreement's result above the random expectation is retained. Predicted MTV's proximity to the oracle is a descriptive result for this development cohort, not evidence that a size baseline is generally optimal.
+
+At a simulated 20% review budget (4 referred, 16 retained), the post-hoc share of cohort FNV assigned to the four referrals was 49.2% for entropy, 23.7% for variance, 65.5% for Predicted MTV, and 0.0% for Pairwise disagreement. This allocation is not observed clinical correction, lesion sensitivity, or reduced missed disease. Computational common-uncovered regions are candidate mechanisms only; without clinically validated reference completeness and matching, they are not complete lesion misses. No clinically major false-negative endpoint was assessed. See [methods and evidence boundaries](docs/FDG20_PILOT_METHODS.md) and the source-bound [aggregate figure](docs/figures/fdg20_pilot_aggregate.png).
 
 ## Engineering evidence
 
@@ -38,7 +39,7 @@ At a simulated 20% review budget (4 referred, 16 retained), the post-hoc share o
 | Geometry, quantification, and binary segmentation | Public implementation with synthetic/analytic tests | Does not establish clinical registration or reference completeness |
 | Risk–coverage and tie handling | Public utility and synthetic tests | Tests mathematics, not patient-level reliability |
 | FDG20 fixed predictions | Aggregate results and methods summary | Protected patient inputs and predictions are not included; full calculations cannot be independently rerun here |
-| Public aggregate figure | Source-bound historical PNG; aggregate-JSON-to-SVG renderer and schema checks | The PNG is the source-bound historical release figure. The current script reads public aggregate JSON and generates SVG only; it did not generate this PNG. The SVG has structural checks but no rendered visual QA and is not in the public whitelist. |
+| Public aggregate figure | [Released PNG](docs/figures/fdg20_pilot_aggregate.png) and JSON-to-SVG renderer | [Figure provenance and QA limits](docs/FDG20_PILOT_METHODS.md#figure-provenance-and-display) |
 
 ## Research roadmap
 
@@ -50,9 +51,10 @@ The [research design candidate](docs/RESEARCH_DESIGN_CANDIDATE.md) remains **PRO
 
 ## Reproduce the public artifacts
 
-The aggregate JSON can generate an SVG summary, and the public test checks the JSON contract and renderer output:
+With Python 3.10 or newer, install the package and test extra. The aggregate JSON can generate an SVG summary; the targeted tests check the public artifact contract and ranking utilities:
 
 ```powershell
+python -m pip install -e ".[test]"
 python scripts/render_fdg20_public_figure.py --input docs/fdg20_pilot_aggregate_summary.json --output .\fdg20_summary.svg
 python -m pytest tests/test_fdg20_public_artifacts.py tests/test_risk_coverage.py
 ```
