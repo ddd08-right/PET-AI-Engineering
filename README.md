@@ -1,23 +1,47 @@
-# PET/CT Segmentation Reliability: A Development Pilot and Research Roadmap
+# Patient-Level Reliability Assessment for Quantitative Whole-Body PET/CT Segmentation
 
-Can scores derived from fixed whole-body PET/CT segmentation outputs prioritize examinations with larger spatial errors for review? This repository presents an audited 20-case FDG development pilot and a staged research plan. Engineering feasibility is demonstrated in this setting; clinical benefit, independent validation, and cross-tracer transfer remain untested.
+## Clinical Problem
 
-## Research question and evidence status
+After PET/CT segmentation is fixed, which examinations may contain substantial spatial error and should receive priority under a limited human review budget? This repository presents inspectable engineering, a separate five-case training record, and a 20-case FDG development pilot. Independent reliability and clinical benefit remain untested.
 
-The project asks whether reference-free signals from a fixed segmentation can rank cases by their observed spatial error, and what those signals miss. The FDG20 pilot is **DEVELOPMENT / TRAINING_EXPOSURE_NOT_EXCLUDED**: it is not an independent test, an out-of-fold evaluation, or an estimate of population prevalence. The cohort was availability-sampled, with 10 reference-foreground and 10 empty-reference annotations; an empty annotation is not evidence of clinical negativity.
+Start with the [one-page research overview](docs/PI_RESEARCH_OVERVIEW.md), inspect the [claim-to-evidence matrix](docs/PI_EVIDENCE_MATRIX.md), then review the [proposed research gates](docs/RESEARCH_GATES.md).
 
-## Workflow
+## Technical Workflow
 
-CT/SUVbw input and QC → fixed five-fold model path with TTA enabled → two
-separate branches: official logits integration → fixed final mask → Predicted
-MTV size baseline; and member probabilities/masks → entropy, fold variance, and
-Pairwise disagreement. Scores order the same cases under a simulated review
-budget; the reference enters evaluation and post-hoc error analysis only, never
-prediction or reference-free scoring.
+The diagram describes the protected FDG20 workflow, not a public end-to-end runner or the separate 40-epoch training experiment.
 
-## FDG20 development pilot
+```mermaid
+flowchart TD
+    A["CT/PET input and QC"] --> B["Fixed five-fold segmentation model; TTA enabled"]
+    B --> C["Official mean-logits integration"]
+    C --> D["Fixed final mask"]
+    D --> E["Predicted MTV: size baseline, not UQ"]
+    B --> F["Member probabilities and masks"]
+    F --> G["Entropy / Fold variance / Pairwise disagreement"]
+    E --> H["Patient-level reliability ranking"]
+    G --> H
+    H --> I["Simulated selective-review budget"]
+    I --> J["Reference-based evaluation"]
+    D --> J
+    R["Reference: evaluation only"] --> J
+```
 
-The same official five-fold, TTA-enabled path and official logits integration produced each fixed final mask. Five folds are not five independent seeds. Member probability summaries support the reference-free scores; the reference enters evaluation only. The primary evaluated spatial risk is `R_spatial = FPV + FNV` in mL. It differs from absolute net MTV error, `E_MTV = |FPV − FNV|`, and from FNV alone.
+Five folds have overlapping training sets; they are **not five independent seeds**. Reference masks enter evaluation and post-hoc error analysis only, never prediction or reference-free scoring. The official final mask is distinct from mean member probability used for scoring.
+
+## Verified Engineering and Development Evidence
+
+| Evidence track | Inspectable evidence | Status and boundary |
+|---|---|---|
+| QC, quantification, evaluation, reliability, provenance and synthetic PyTorch | [Implementation–test pairs](docs/PROGRAMMING_EVIDENCE.md) | `ENGINEERING_SMOKE`: synthetic/analytic behavior, not clinical validity |
+| Real 40-epoch training and checkpoint evaluation | [Five-case record](docs/DEVELOPMENT_BASELINE_40E_CASE.md), [aggregate JSON](docs/development_baseline_40e_summary.json) | `DEVELOPMENT_EXPOSED`: one seed, fold 0; final versus EMA-selected checkpoint; insufficient clinical performance |
+| FDG20 fixed-prediction reliability analysis | [Methods](docs/FDG20_PILOT_METHODS.md), [aggregate JSON](docs/fdg20_pilot_aggregate_summary.json), [released figure](docs/figures/fdg20_pilot_aggregate.png) | Completed development analysis; training exposure not excluded; aggregate-only public evidence |
+| Independent FDG, clinically adjudicated lesion errors, reader study, PSMA/cross-centre validation | [Research gates](docs/RESEARCH_GATES.md) | `PROPOSED / NOT RUN`; SAP and clinical-reference SOP `PENDING` |
+
+The five-case experiment is not pooled with FDG20. Its checkpoint rankings differ across Dice and net-volume error, and an analytic empty-mask control has lower volume MAE while missing all foreground. These are engineering failure-analysis observations, not high-accuracy segmentation or clinical-effectiveness evidence.
+
+## FDG20 Development Pilot
+
+**DEVELOPMENT / TRAINING_EXPOSURE_NOT_EXCLUDED; not independent validation.** The 20 availability-sampled cases contain 10 reference-foreground and 10 empty-reference annotations; empty reference does not establish clinical negativity. Spatial risk is `R_spatial = FPV + FNV` (mL), distinct from absolute net MTV error `E_MTV = |FPV − FNV|` and FNV alone.
 
 | Score | Analysis status | Discrete AURC (mL) | Mean retained risk at 80% coverage (mL) |
 |---|---|---:|---:|
@@ -26,41 +50,48 @@ The same official five-fold, TTA-enabled path and official logits integration pr
 | Predicted MTV | Post-hoc size baseline; not UQ | 5.97 | 10.10 |
 | Pairwise disagreement | Post-hoc | 58.64 | 35.70 |
 
-Display values use decimal round-half-up: two decimals for AURC/risk and one decimal for FNV percentages; the JSON retains original precision. Frozen labels in this table apply to AURC and retained risk only; all referral-FNV shares below are post-hoc.
+Values are decimal round-half-up from the linked JSON, to two decimals. Frozen labels apply only to AURC and retained risk. Lower AURC is better: analytic random-order expectation is 28.63 mL; reference-informed oracle is 5.80 mL and is not deployable. **Pairwise disagreement performed worse than the random-order expectation.** Predicted MTV's proximity to the oracle is descriptive for this cohort, not a general advantage or a UQ result.
 
-Lower AURC is better. The analytic random-order expectation was 28.63 mL; the reference-informed oracle was 5.80 mL and is not deployable. Pairwise disagreement's result above the random expectation is retained. Predicted MTV's proximity to the oracle is a descriptive result for this development cohort, not evidence that a size baseline is generally optimal.
+At a simulated 20% review budget (4 referred, 16 retained), the share of cohort FNV assigned to referrals was:
 
-At a simulated 20% review budget (4 referred, 16 retained), the post-hoc share of cohort FNV assigned to the four referrals was 49.2% for entropy, 23.7% for variance, 65.5% for Predicted MTV, and 0.0% for Pairwise disagreement. This allocation is not observed clinical correction, lesion sensitivity, or reduced missed disease. Computational common-uncovered regions are candidate mechanisms only; without clinically validated reference completeness and matching, they are not complete lesion misses. No clinically major false-negative endpoint was assessed. See [methods and evidence boundaries](docs/FDG20_PILOT_METHODS.md) and the source-bound [aggregate figure](docs/figures/fdg20_pilot_aggregate.png).
+| Score | Referral-FNV share | Analysis status |
+|---|---:|---|
+| Entropy | 49.2% | Post-hoc |
+| Fold probability variance | 23.7% | Post-hoc |
+| Predicted MTV | 65.5% | Post-hoc |
+| Pairwise disagreement | 0.0% | Post-hoc |
 
-## Engineering evidence
+**All four shares are post-hoc.** They measure error allocation, not corrected errors, lesion sensitivity, reduced missed disease, saved reader time, or improved clinical safety. Computational common-uncovered regions are candidates, not clinically confirmed complete lesion misses. No clinically major false-negative endpoint was assessed. Exact values and metric-level labels remain in the [unchanged source JSON](docs/fdg20_pilot_aggregate_summary.json).
 
-| Evidence | What is available | Boundary |
-|---|---|---|
-| Geometry, quantification, and binary segmentation | Public implementation with synthetic/analytic tests | Does not establish clinical registration or reference completeness |
-| Risk–coverage and tie handling | Public utility and synthetic tests | Tests mathematics, not patient-level reliability |
-| FDG20 fixed predictions | Aggregate results and methods summary | Protected patient inputs and predictions are not included; full calculations cannot be independently rerun here |
-| Public aggregate figure | [Released PNG](docs/figures/fdg20_pilot_aggregate.png) and JSON-to-SVG renderer | [Figure provenance and QA limits](docs/FDG20_PILOT_METHODS.md#figure-provenance-and-display) |
+## Programming Contributions and Upstream Attribution
 
-## Research roadmap
+Repository implementations include [geometry QC](src/pet_ai/qc/geometry.py), [physical volume](src/pet_ai/quantification/volume.py), [segmentation evaluation](src/pet_ai/evaluation/segmentation.py), [risk–coverage and tie handling](src/pet_ai/reliability/risk_coverage.py), and [run provenance](src/pet_ai/reproducibility/run_manifest.py). [Programming evidence](docs/PROGRAMMING_EVIDENCE.md) links each behavior to tests, including the compact synthetic PyTorch path and public sampler/trainer adaptation.
 
-**Q1 — Does UQ add error-ordering value over a low-cost size baseline, and where are its blind spots?** Audit training and model-selection exposure, freeze a comparison (Entropy versus Predicted MTV is a proposal, not an approved primary endpoint), and evaluate fixed scores on independent FDG patients with an expert-reviewed reference. Separate spatial error, FNV, absolute net-volume error, and lesion-level errors.
+These artifacts demonstrate inspectable implementation work, not sole authorship of all code. nnU-Net supplies its framework, architecture, training machinery and checkpoint selection; AutoPET supplies the dataset ecosystem; LesionTracer supplies the upstream FDG20 model family. See [third-party attribution](THIRD_PARTY.md) and [architecture](docs/ARCHITECTURE.md). The public adaptation is a `PARTIAL_RECIPE`, not byte-identical historical orchestration.
 
-**Q2 — After a blind spot is clinically confirmed, can complementary evidence improve review yield without unacceptable burden?** Only then propose separately approved cue-generation or auxiliary-model work, keeping the primary mask fixed. Measure false prompts, residual false-negative burden, candidate count, and actual reader time. No auxiliary method is assumed to help. PSMA and external-centre transfer are later, separate validation stages; no independent FDG cohort, lesion-level clinical adjudication, reader-time study, or transfer validation is complete.
+## PhD Research Roadmap
 
-The [research design candidate](docs/RESEARCH_DESIGN_CANDIDATE.md) remains **PROPOSED / NOT RUN**; SAP and clinical-reference SOP approval are pending.
+All three studies are **PROPOSED / NOT RUN**:
 
-## Reproduce the public artifacts
+1. **Independent FDG fixed-score reliability validation:** audit exposure and data permissions, approve a SAP, then compare UQ against Predicted MTV with paired ΔAURC and patient-level confidence intervals.
+2. **Conditional clinical missed-lesion and failure analysis:** approve reference completeness and lesion matching; distinguish voxel FNV, complete lesion misses and clinically major misses. Consider complementary cues or an auxiliary model only after a blind spot is clinically confirmed.
+3. **Later reader study and PSMA/cross-centre validation:** measure actual reader cost and incremental benefit; evaluate tracer, centre, scanner and patient-spectrum shifts under separate protocols.
 
-With Python 3.10 or newer, install the package and test extra. The aggregate JSON can generate an SVG summary; the targeted tests check the public artifact contract and ranking utilities:
+Current blockers are unavailable independent FDG data (search paused), unresolved exposure, pending SAP/reference SOP, historical execution-byte identity and checkpoint redistribution rights. Sample sizes, centres, expected effects, thresholds and approval decisions remain `TBD / PENDING`. The [auditable gates](docs/RESEARCH_GATES.md) elaborate the retained [research design candidate](docs/RESEARCH_DESIGN_CANDIDATE.md).
+
+## Reproducibility and Evidence Limitations
+
+With Python 3.10 or newer:
 
 ```powershell
 python -m pip install -e ".[test]"
-python scripts/render_fdg20_public_figure.py --input docs/fdg20_pilot_aggregate_summary.json --output .\fdg20_summary.svg
-python -m pytest tests/test_fdg20_public_artifacts.py tests/test_risk_coverage.py
+python -m ruff check .
+python -m pytest -q -m "not pytorch"
+python scripts/verify_public_repo.py
+python scripts/demo_pipeline.py
+python scripts/render_fdg20_public_figure.py --input docs/fdg20_pilot_aggregate_summary.json --output ./fdg20_summary.svg
 ```
 
-These commands exercise public aggregate display and synthetic ranking behavior only. They do not reproduce protected patient calculations. A complete run requires separately governed inputs, historical execution code and permitted model artifacts.
+With an existing compatible CPU PyTorch environment, also run `python -m pytest -q -m pytorch`. The SVG command displays public aggregates; it does not byte-reproduce the historical PNG. Synthetic tests and display checks cannot recompute protected patient-level FDG20 or five-case results, validate clinical references, or establish clinical benefit. Rendered visual QA is separate from structural checks.
 
-## Scope and provenance
-
-The public repository contains no patient images, masks, member probabilities, case mapping, private orchestration, or model weights. Historical adaptation-code byte identity and checkpoint redistribution rights remain unresolved. Hashes support artifact traceability, not clinical validity. The earlier [five-case 40-epoch development case](docs/DEVELOPMENT_BASELINE_40E_CASE.md) remains a separate historical engineering record; it is not pooled with FDG20. See [architecture](docs/ARCHITECTURE.md), [programming evidence](docs/PROGRAMMING_EVIDENCE.md), [metrics](docs/METRICS.md), [data provenance](docs/DATA_PROVENANCE.md), and [third-party attribution](THIRD_PARTY.md).
+Patient images, masks, member probabilities, case mappings, private orchestration and weights are excluded. Full reproduction needs separately governed data, historical execution code and permitted model artifacts. Hashes establish traceability, not clinical validity. See [data provenance](docs/DATA_PROVENANCE.md), [metric definitions](docs/METRICS.md), and the [evidence matrix](docs/PI_EVIDENCE_MATRIX.md) for exact sources and public reproducibility boundaries.
