@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -11,9 +12,7 @@ import pytest
 POWERSHELL = shutil.which("powershell.exe") or shutil.which("pwsh.exe")
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WRAPPER = REPO_ROOT / "scripts" / "train_nnunet.ps1"
-VALIDATION_PYTHON = REPO_ROOT.parents[1] / (
-    "_pet_ai_public_validation_20260924_01/venv/Scripts/python.exe"
-)
+VALIDATION_PYTHON = Path(sys.executable)
 
 
 def _fake_command(path: Path, exit_code: int) -> Path:

@@ -81,6 +81,8 @@ Current blockers are unavailable independent FDG data (search paused), unresolve
 
 ## Reproducibility and Evidence Limitations
 
+[Synthetic fixed-mask selective review](docs/SYNTHETIC_SELECTIVE_REVIEW_DEMO.md): `python scripts/demo_fixed_mask_selective_review.py` (synthetic only; no clinical claim).
+
 With Python 3.10 or newer:
 
 ```powershell
