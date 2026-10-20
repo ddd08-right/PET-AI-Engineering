@@ -6,6 +6,8 @@ After PET/CT segmentation is fixed, which examinations may contain substantial s
 
 Start with the [one-page research overview](docs/PI_RESEARCH_OVERVIEW.md), inspect the [claim-to-evidence matrix](docs/PI_EVIDENCE_MATRIX.md), then review the [proposed research gates](docs/RESEARCH_GATES.md).
 
+The [evidence-grounded PhD framework](docs/PHD_RESEARCH_FRAMEWORK.md) connects completed development observations, verified prior literature and three conditional studies; all new studies remain **PROPOSED / NOT RUN**.
+
 ## Technical Workflow
 
 The diagram describes the protected FDG20 workflow, not a public end-to-end runner or the separate 40-epoch training experiment.
