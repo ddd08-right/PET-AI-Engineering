@@ -106,7 +106,12 @@ records published versus preprint access separately. No first-use, general
 superiority or novel-network claim is made. These questions build on existing
 PET referral work, rather than treating uncertainty itself as a new contribution.
 
-## Layer 4 — Three sequential studies, all D: PROPOSED / NOT RUN
+## Layer 4 — Three conditional studies, all D: PROPOSED / NOT RUN
+
+Study 2 is triggered by reproducible, clinically confirmed failures, including
+after a null or adverse Study 1 result; it does not require a positive UQ result.
+Study 3 has its own data, statistical and clinical prerequisites and can evaluate
+a frozen baseline strategy without a successful Study 2 cue or auxiliary model.
 
 ### Study 1 — Independent PET/CT Reliability Benchmark
 
@@ -123,7 +128,10 @@ unresolved rather than establish equivalence.
 
 **Methods and estimand:** use an adequately developed, traceable fixed baseline
 segmentation system, common final predictions and the same eligible denominator
-for both scores. Do not default to an inadequate five-case model merely because
+for both scores. Scoring must be reference-blind; references enter evaluation
+only. Verify patient-level independence from every member's training, pretraining
+and selection, including calibration and preprocessing fitting. Do not default
+to an inadequate five-case model merely because
 it has a recorded run. Freeze model/member identity, inference/TTA, mask,
 probability calibration, scoring grid/ROI, invalid/failure rules and referral
 budget before independent outcome access. The public full-grid score contract
@@ -231,6 +239,10 @@ transfer does not justify silent target-test tuning or an external-validation la
 The requirements below are references to the unchanged [gate definitions](RESEARCH_GATES.md),
 not a new gate system or a change from pending to approved.
 
+G1 remains an unmet research gate (the public requirements are **PENDING**);
+the most recent private provenance audit is **BLOCKED_PROVENANCE** because of
+missing lineage evidence. No patient-level exposure audit has been completed.
+
 | Existing gates | Role in the sequence | Release condition / current decision |
 |---|---|---|
 | G1 | Rights and all-member exposure; prerequisite to every real study | **BLOCKED_PROVENANCE**; patient Phase C **NOT_RUN**; FDG20 independence **NOT_VERIFIED** |
@@ -267,16 +279,16 @@ licensing, patient/member-record access and research approval are different gate
 
 ```mermaid
 flowchart TD
-    C["Clinical need: prioritize examination review"] --> A["COMPLETED: public engineering and synthetic tests"]
-    A --> B["DEVELOPMENT ONLY: separate five-case and FDG20 observations"]
-    B --> Q["Unanswered: incremental ranking, shared error, transport"]
-    Q --> S1["Study 1: independent benchmark - PROPOSED / NOT RUN"]
-    S1 --> S2["Study 2: adjudicated failures and conditional cues - PROPOSED / NOT RUN"]
-    S2 --> S3["Study 3: transfer and reader workflow - PROPOSED / NOT RUN"]
-    S3 --> P["Potential endpoint: measured review benefit - NOT DEMONSTRATED"]
-    G1["G1 BLOCKED; G2-G4 pending; G5 conditional"] -.-> S1
-    G2["G4 and G6-G7: reference and confirmation required"] -.-> S2
-    G3["G8 actual review; G9-G10 transfer and benefit required"] -.-> S3
+    C["Clinical need: prioritize review"] --> A["COMPLETED: engineering / synthetic tests"]
+    A --> B["DEVELOPMENT ONLY: five-case / FDG20"]
+    B --> Q["Unanswered: ranking / shared error / transfer"]
+    Q --> S1["Study 1: independent benchmark<br/>PROPOSED / NOT RUN"]
+    S1 -->|"Confirmed failures; UQ gain not required"| S2["Study 2: adjudication / conditional cues<br/>PROPOSED / NOT RUN"]
+    Q --> S3["Study 3: transfer / reader workflow<br/>PROPOSED / NOT RUN"]
+    S3 --> P["Potential review benefit<br/>NOT DEMONSTRATED"]
+    G1["G1 BLOCKED; G2-G4 pending<br/>G5 conditional"] -.-> S1
+    G2["G4 / G6-G7: unmet reference<br/>and confirmation conditions"] -.-> S2
+    G3["G8-G10: unmet reader<br/>and transfer conditions"] -.-> S3
     classDef engineering fill:#e3f2fd,stroke:#1565c0,color:#111;
     classDef development fill:#fff3e0,stroke:#b45309,color:#111;
     classDef blocked fill:#ffebee,stroke:#b91c1c,color:#111;
@@ -287,8 +299,8 @@ flowchart TD
     class S1,S2,S3,P,G2,G3 proposed;
 ```
 
-Arrows express proposed dependency, not a completed experiment or automatic
-progression after a favorable result. Gate nodes are conditions. Source is
+Arrows express conditional research paths, not completed experiments. Study 3
+does not depend on Study 2 efficacy; gate nodes show unmet conditions. Source is
 native Mermaid; rendering/visual QA status is reported in the PR, not presumed.
 
 ## Potential contribution and risks
@@ -299,6 +311,13 @@ utility under shift. A negative, well-controlled result could delimit where UQ
 adds no value. This is **potential contribution**, not established novelty;
 selective prediction, segmentation QC and PET referral already have prior art.
 No new architecture, clinical safety guarantee or publication outcome is claimed.
+The [prior-art overlap assessment](RESEARCH_LITERATURE_EVIDENCE.md#prior-art-overlap-assessment)
+includes whole-body uncertainty augmentation and model routing: these are
+already studied approaches, not proposed methodological inventions here.
+The remaining questions concern paired fixed-mask UQ-versus-size ranking under
+prespecified spatial risk and review budgets, clinical failure adjudication,
+and separately governed transfer and actual review cost. Their novelty and
+value remain to be established.
 
 Main threats are inaccessible lineage, reference incompleteness, poor baseline
 segmentation, background/burden confounding, dependence among exams/members,

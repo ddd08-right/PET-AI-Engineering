@@ -83,6 +83,9 @@ and [author full-text preprint](https://arxiv.org/html/1811.09800), §3.3–3.4
 uncertainty methods and §4–5 experimental setup/results, were checked separately. MC-dropout structure
 quality associations are the bounded support; no PET performance/correlation
 number or claim of general correctness is transferred.
+§3.4.2 defines structure-volume coefficient of variation, mean pairwise Dice,
+all-sample intersection/union and mean voxel uncertainty. QC relates these to
+structure Dice, not whole-body examination FPV+FNV or observed reader benefit.
 
 ### L06
 
@@ -97,6 +100,12 @@ The claim of a robust Pairwise baseline is in the published abstract/highlights.
 §5/Fig. 6, supplies the accessible CT/MRI/method context. It is a **2024
 preprint**, not relabeled as the final 2025 full text; final-PDF automated access
 was unsuccessful. No version-specific quantitative result is imported.
+In that preprint, §4.1 uses per-case `1 - mean class DSC` risk (auxiliary NSD);
+§4.4.3 averages all unordered mask-pair Dice values, using mean class Dice for
+multiclass masks. Table 2 covers brain/heart/prostate MRI and COVID/kidney CT,
+with corruption, spectrum, scanner/site shifts and an in-distribution task.
+Fig. 6 also shows shared-error failures. These definitions differ from FDG20's
+binary mL risk and development exposure; this is not a same-condition replication.
 
 ### L07
 
@@ -151,6 +160,40 @@ PET/CT uncertainty/referral prior art. The earlier **2023 preprint has a differe
 title and analysis description**; its sample counts, method counts and results
 are not substituted into the 2024 paper. This check uses the published identity
 and text; no numerical clinical benefit is borrowed.
+The models use 3D residual U-Nets. Patient scores include entropy variants,
+volume coefficient of variation and DSC-risk. Cross-validation supports
+quality-threshold estimation; holdout evaluation examines batch and fixed-threshold
+referral. Proposed manual correction in the workflow is not evidence of measured
+correction time or improved clinical outcomes.
+
+## Prior-art overlap assessment
+
+Model identities below are the papers' methods, not our historical checkpoints.
+Version/access limits above apply; these comparisons do not establish novelty.
+
+| Original study | Imaging task | Model identity | UQ level | Risk endpoint | Review strategy | Validation type | Our remaining testable question |
+|---|---|---|---|---|---|---|---|
+| Roy 2019, L05 | Brain MRI structures | Bayesian QuickNAT / MC dropout | Voxel and structure | Structure Dice/QC | QC indicators | MRI seen/unseen datasets | Does examination ranking add to fixed-mask PET size? |
+| Zenk 2025, L06; methods: 2024 v2 | CT/MRI segmentation | U-Net; ensemble/dropout | Pixel to case; pairwise masks | 1−mean DSC; auxiliary NSD | Risk–Coverage rejection | Multiple tasks and shifts | Does ordering hold for independent PET spatial mL risk? |
+| Sahlsten 2024, L11 | PET/CT OPC primary GTV | Residual U-Net ensembles | Voxel and patient | DSC; referral/quality estimation | Batch and threshold referral | Cross-validation and external holdout | Increment beyond MTV; whole-body risk and actual review cost? |
+| Biswas 2026, P01 preprint | Whole-body FDG/PSMA | nnU-Net ensembles; augmented model | Voxel; case routing | Dice / FPVol / FNVol | Automated model choice | Held-out and Deep-PSMA testing | Fixed-mask review ordering and adjudicated clinical yield? |
+
+### P01 — related preprint, separate from eleven published references
+
+Biswas BA et al. **Improving PET/CT-Based Whole-Body Lesion Segmentation Using
+Prediction Uncertainty-Augmented Models** (2026).
+[Record](https://arxiv.org/abs/2606.10115), [full HTML](https://arxiv.org/html/2606.10115).
+**VERIFIED_PREPRINT — BOUNDED CLAIM SUPPORT**: methods/results, figure captions
+and Tables 1–5 inspected; no reproduction or peer-review inference.
+§§2.4–2.7 use five nnU-Net members, entropy decomposition, an epistemic input
+channel and PET-based routing. §§3.2/4.2 evaluate voxel errors, including per-case
+AUROC, not our examination AURC. §§4–5 report reduced FNVol with increased FPVol;
+the router transfers poorly to Deep-PSMA. §2.2 reports patient-grouped AutoPET
+splits and exclusively held-out Deep-PSMA: paired FDG/PSMA in prostate cancer,
+including an FDG disease-spectrum shift. This reported design does not independently
+verify all pretrained-member exposure. Uncertainty-guided augmentation, failure
+analysis and transfer overlap our candidates; no first-use claim is justified.
+Human correction/cost benefit is **NOT_VERIFIED**. No performance is imported.
 
 ## Theory-to-design transfer map
 
@@ -169,12 +212,9 @@ Each right-hand entry is our proposal/inference, not a finding of the cited pape
 
 - Roy 2019 and Zenk 2025 are now specifically identified above; no vague
   author/year shorthand is used as evidence. Their tasks and versions remain distinct.
-- [Improving PET/CT-Based Whole-Body Lesion Segmentation Using Prediction
-  Uncertainty-Augmented Models](https://arxiv.org/abs/2606.10115) (2026) was
-  screened as related prior art. **PARTIAL_VERIFICATION / NOT_USED** for core
-  support: only the abstract record was inspected, not the full methods or
-  downstream clinical claim. It blocks any assertion that this is an exhaustive
-  novelty search; no results or external-validation claim are imported.
+- P01 is now full-text checked within the bounds above. It remains a preprint,
+  excluded from the **eleven published references**; no exhaustive novelty
+  search or independent verification of its patient/member lineage is claimed.
 - No claim that this project invented selective review, ensemble QC, PET
   uncertainty, or risk–coverage is supported or made. Proposed contributions
   require the specific independent comparisons in the framework.
