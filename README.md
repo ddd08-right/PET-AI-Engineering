@@ -1,7 +1,5 @@
 # Patient-Level Reliability Assessment for Quantitative Whole-Body PET/CT Segmentation
 
-[Synthetic fixed-mask selective review](docs/SYNTHETIC_SELECTIVE_REVIEW_DEMO.md): `python scripts/demo_fixed_mask_selective_review.py` (synthetic only; no clinical claim).
-
 ## Clinical Problem
 
 After PET/CT segmentation is fixed, which examinations may contain substantial spatial error and should receive priority under a limited human review budget? This repository presents inspectable engineering, a separate five-case training record, and a 20-case FDG development pilot. Independent reliability and clinical benefit remain untested.
@@ -82,6 +80,8 @@ All three studies are **PROPOSED / NOT RUN**:
 Current blockers are unavailable independent FDG data (search paused), unresolved exposure, pending SAP/reference SOP, historical execution-byte identity and checkpoint redistribution rights. Sample sizes, centres, expected effects, thresholds and approval decisions remain `TBD / PENDING`. The [auditable gates](docs/RESEARCH_GATES.md) elaborate the retained [research design candidate](docs/RESEARCH_DESIGN_CANDIDATE.md).
 
 ## Reproducibility and Evidence Limitations
+
+[Synthetic fixed-mask selective review](docs/SYNTHETIC_SELECTIVE_REVIEW_DEMO.md): `python scripts/demo_fixed_mask_selective_review.py` (synthetic only; no clinical claim).
 
 With Python 3.10 or newer:
 

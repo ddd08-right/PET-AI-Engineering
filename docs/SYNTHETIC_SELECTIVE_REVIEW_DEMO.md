@@ -58,3 +58,9 @@ FDG20 remains **DEVELOPMENT / TRAINING_EXPOSURE_NOT_EXCLUDED**; G1 remains
 **BLOCKED_PROVENANCE**, Phase C **NOT_RUN**, historical Route A
 **PENDING_CUSTODIAN_EVIDENCE**, new Route B **DESIGN CANDIDATE / NOT RUN**.
 The demo reads no private evidence and changes none of these gates.
+
+The historical [40-epoch development experiment](DEVELOPMENT_BASELINE_40E_CASE.md)
+and [FDG20 development pilot](FDG20_PILOT_METHODS.md) retain their recorded
+results and exposure limitations. Neither is this mathematical demo. The
+[future independent-study proposals](RESEARCH_DESIGN_CANDIDATE.md) remain
+proposals, not experiments executed or authorized by this demonstration.
