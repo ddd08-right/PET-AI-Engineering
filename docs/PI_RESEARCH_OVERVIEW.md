@@ -16,12 +16,14 @@ The [FDG20 pilot](FDG20_PILOT_METHODS.md) uses fixed official five-fold predicti
 
 No independent reliability advantage, clinically confirmed complete lesion-miss endpoint, clinical safety benefit, reader-time saving, independent PSMA or external-centre validation has been demonstrated. Simulated referral-FNV allocation is not observed error correction. Computational common-uncovered regions are candidate failure mechanisms, not clinically confirmed missed lesions. Background/field-of-view sensitivity, unknown exposure and reference completeness constrain interpretation. Checkpoint redistribution rights and historical adaptation-code byte identity remain unresolved.
 
-## Candidate PhD research directions
+## Evidence-driven research sequence
 
 All stages are **PROPOSED / NOT RUN**; the SAP and clinical-reference SOP are **PENDING**.
 
-1. **Independent FDG reliability validation:** audit permissions and all training/model-selection exposure, freeze scoring and paired ΔAURC against Predicted MTV before outcome access, then report patient-level intervals, failures and error analysis on independent patients.
-2. **Conditional missed-lesion research:** after expert confirmation of a reproducible blind spot and an approved complete reference/matching SOP, separate voxel FNV, complete lesion misses and clinically major misses. Consider complementary evidence or an auxiliary model only with separate approval and explicit false-prompt costs.
-3. **Later reader and transfer studies:** measure actual reader interaction cost and review yield; separately validate PSMA and cross-centre generalization across tracer, equipment and patient-spectrum shifts.
+1. **Observation to independent benchmark:** development results do not demonstrate an incremental UQ advantage over the size baseline. After permissions and all-member exposure audit, freeze the candidate Entropy-versus-MTV paired ΔAURC comparison before independent outcomes. A null or adverse comparison is a valid result.
+2. **Benchmark to mechanism:** if independent failure analysis and expert review confirm a reproducible blind spot under a complete reference/matching SOP, distinguish voxel FNV, complete reference-lesion misses and clinically major misses. Test low-cost complementary cues first; an auxiliary model requires a separate incremental question and explicit prompt/workload costs.
+3. **Mechanism to transfer and workflow:** only under separate transfer/reader protocols, test whether ranking survives tracer, centre, scanner and disease-spectrum shifts, and measure actual time/corrections. Simulated referral is not observed clinical benefit; direct transfer and recalibration require separate evaluation.
+
+The [overall PhD framework](PHD_RESEARCH_FRAMEWORK.md) makes these dependencies, falsifiable hypotheses, negative outcomes and unchanged G1–G10 conditions explicit. The [literature evidence register](RESEARCH_LITERATURE_EVIDENCE.md) separates published support from this project's PET transfer assumptions. G1 remains **BLOCKED_PROVENANCE**; patient Phase C **NOT_RUN**; historical FDG20 independence **NOT_VERIFIED**. Route A is **PENDING_CUSTODIAN_EVIDENCE**; Route B is **DESIGN CANDIDATE / NOT RUN**. Neither document grants execution permission or changes historical results.
 
 The immediate blocker is independent-data access and exposure documentation; the independent FDG data search is paused. Sample sizes, centre counts, expected effects and clinical thresholds remain `TBD`; approvals remain `PENDING`. See [research gates](RESEARCH_GATES.md), the retained [design candidate](RESEARCH_DESIGN_CANDIDATE.md), and the [claim-to-source matrix](PI_EVIDENCE_MATRIX.md). These stages define substantive research still required for a doctoral contribution.
